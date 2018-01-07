@@ -1,0 +1,5 @@
+Network_Connection_BadVersion_Client = Wrong Connection Protocol: Client update required!
+Network_Connection_BadVersion_Server = Wrong Connection Protocol: Server update required!
+Network_Connection_NewConnection = [NetworkManager]: New connection from [{0} / {1}]
+Network_Connection_NewConnection_Authed = [NetworkManager]: Authed connection from [{0} / {1}]
+Network_Connection_NewDisconnected = [NetworkManager]: Disconnected [{0} / {1}] from reasone: {2}

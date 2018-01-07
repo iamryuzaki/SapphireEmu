@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EEB15EED-F0F0-40A0-A6BF-DE5240660ACD}</ProjectGuid>
+    <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SapphireEmu</RootNamespace>
+    <AssemblyName>SapphireEmu</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Builded</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Builded\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Bootstrap.cs" />
+    <Compile Include="Data\Base\GObject\E_EntityFlags.cs" />
+    <Compile Include="Data\Base\GObject\E_LifeState.cs" />
+    <Compile Include="Data\Base\GObject\E_PlayerButton.cs" />
+    <Compile Include="Data\Base\GObject\E_PlayerFlags.cs" />
+    <Compile Include="Data\Base\GObject\E_PlayerModelState.cs" />
+    <Compile Include="Data\Base\Message.cs" />
+    <Compile Include="Data\Base\Network.cs" />
+    <Compile Include="Data\Base\PrefabID.cs" />
+    <Compile Include="Data\BuildingInformation.cs" />
+    <Compile Include="Data\Settings.cs" />
+    <Compile Include="Environment\ApplicationManager.cs" />
+    <Compile Include="Environment\EACManager.cs" />
+    <Compile Include="Environment\NetworkManager.cs" />
+    <Compile Include="Environment\SteamworksManager.cs" />
+    <Compile Include="Extended\Network.cs" />
+    <Compile Include="Extended\Reflection.cs" />
+    <Compile Include="Extended\Rust.cs" />
+    <Compile Include="Extended\String.cs" />
+    <Compile Include="Rust\GObject\BaseCombatEntity.cs" />
+    <Compile Include="Rust\GObject\BaseEntity.cs" />
+    <Compile Include="Rust\GObject\BaseNetworkable.cs" />
+    <Compile Include="Rust\GObject\BasePlayer.cs" />
+    <Compile Include="Rust\ZonaManager\GameZona.cs" />
+    <Compile Include="Rust\ZonaManager\ZonaManager.cs" />
+    <Compile Include="Struct\Network\UserGiveInformation.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="EasyAntiCheat.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\EasyAntiCheat.Server.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Facepunch.Network, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\Facepunch.Network.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Facepunch.Raknet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\Facepunch.Raknet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Facepunch.Steamworks, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\Facepunch.Steamworks.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Facepunch.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\Facepunch.System.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Facepunch.Unity, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\Facepunch.Unity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Facepunch.UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\Facepunch.UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
+      <HintPath>..\DefaultData\Reference\CSharp\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
+      <HintPath>..\DefaultData\Reference\CSharp\Mono.Cecil.Mdb.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
+      <HintPath>..\DefaultData\Reference\CSharp\Mono.Cecil.Pdb.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
+      <HintPath>..\DefaultData\Reference\CSharp\Mono.Cecil.Rocks.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Rust.Data, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\Rust.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Rust.Global, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\Rust.Global.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SapphireEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\SapphireEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
