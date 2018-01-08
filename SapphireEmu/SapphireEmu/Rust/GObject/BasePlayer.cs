@@ -79,9 +79,8 @@ namespace SapphireEmu.Rust.GObject
             
             this.CurentGameZona.OnDisconnectedPlayer(this);
             
-            this.SetPlayerFlag(E_PlayerFlags.Sleeping, true);
             this.SetPlayerFlag(E_PlayerFlags.Connected, false);
-            this.SendNetworkUpdate_PlayerFlags();
+            this.SendSleepingStart();
         }
         #endregion
         
@@ -125,13 +124,17 @@ namespace SapphireEmu.Rust.GObject
                 if (this.HasPlayerButton(E_PlayerButton.FIRE_PRIMARY) || this.HasPlayerButton(E_PlayerButton.FIRE_SECONDARY) || this.HasPlayerButton(E_PlayerButton.JUMP))
                 {
                     #region [Section] Spawn Test GameObjects
-//                    for (int i = 0; i < 500; i++)
-//                    {
-//                        var player = this.AddType<BasePlayer>();
-//                        player.SteamID = (ulong)i + 1;
-//                        player.Position = new Vector3(0,215 + (i*0.1f),0);
-//                        player.Spawn((uint)Data.Base.PrefabID.BasePlayer);  
-//                    }
+
+                    if (ListOnlinePlayers.Count == 1)
+                    {
+                        for (int i = 0; i < 100; i++)
+                        {
+                            var player = this.AddType<BasePlayer>();
+                            player.SteamID = (ulong) i + 1;
+                            player.Position = new Vector3(0, 215 + (i * 0.1f), 0);
+                            player.Spawn((uint) Data.Base.PrefabID.BasePlayer);
+                        }
+                    }
                     #endregion
                     
                     this.SetPlayerFlag(E_PlayerFlags.Sleeping, false);
@@ -203,6 +206,7 @@ namespace SapphireEmu.Rust.GObject
                 basePlayer = new ProtoBuf.BasePlayer
                 {
                     userid = this.SteamID,
+                    name = this.Username,
                     playerFlags = (int) this.PlayerFlags,
                     modelState = new ModelState {flags = (int) this.PlayerModelState}
                 }
@@ -257,5 +261,18 @@ namespace SapphireEmu.Rust.GObject
             
         }
         #endregion
+
+        public void SendSleepingStart()
+        {
+            this.SetPlayerFlag(E_PlayerFlags.Sleeping, true);
+            this.PlayerModelState = E_PlayerModelState.Sleeping;
+            this.SendNetworkUpdate_PlayerFlags();
+        }
+
+        public void SendSleepingStop()
+        {
+            this.SetPlayerFlag(E_PlayerFlags.Sleeping, false);
+            this.SendNetworkUpdate_PlayerFlags();
+        }
     }
 }
