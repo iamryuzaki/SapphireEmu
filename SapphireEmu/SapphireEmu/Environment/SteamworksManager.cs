@@ -122,6 +122,7 @@ namespace SapphireEmu.Environment
 
         #endregion
 
+        #region [Method] OnUserAuth
         public void OnUserAuth(Connection _connection)
         {
             bool authResult = BaseSteamServer.Auth.StartSession(_connection.token, _connection.userid);
@@ -131,5 +132,6 @@ namespace SapphireEmu.Environment
             } else
                 NetworkManager.BaseNetworkServer.Kick(_connection, "Steam auth failed");
         }
+        #endregion
     }
 }

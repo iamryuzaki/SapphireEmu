@@ -53,7 +53,6 @@ namespace SapphireEmu.Environment
             if (BaseNetworkServer != null)
             {
                 BaseNetworkServer.Stop("Server is shutdown!");
-                BaseNetworkServer = null;
             }
         }
         #endregion
@@ -132,17 +131,17 @@ namespace SapphireEmu.Environment
         #endregion
 
         #region [Method] [Example] OnPlayerTick
-        private void OnPlayerTick(Message message)
+        private void OnPlayerTick(Message _message)
         {
-            BasePlayer player = Extended.Rust.ToPlayer(message);
+            BasePlayer player = Extended.Rust.ToPlayer(_message);
             if (player != null)
             {
-                player.OnReceivedTick(message);
+                player.OnReceivedTick(_message);
             }
         }
         #endregion
 
-        #region [Method] [Example] OnClientReady
+        #region [Method] [Example] OnRPCMessage
         private void OnRPCMessage(Message _message)
         {
             uint uid = _message.read.EntityID();
@@ -183,7 +182,8 @@ namespace SapphireEmu.Environment
             _message.connection.os = packet.OS;
             _message.connection.protocol = packet.ConnectionProtocol;
             _message.connection.token = packet.SteamToken;
-            
+
+//### Temporary disabled - By ~ TheRyuzaki, this code is connection version variable. ###       
 //            if (_message.connection.protocol > Settings.GameVersion)
 //            {
 //                BaseNetworkServer.Kick(_message.connection, Data.Base.Message.Network_Connection_BadVersion_Server);
@@ -199,6 +199,7 @@ namespace SapphireEmu.Environment
         }
         #endregion
 
+        #region [Method] OnUserAuthSuccess
         public void OnUserAuthSuccess(Connection _connection)
         {
             using (Approval approval = new Approval())
@@ -221,8 +222,8 @@ namespace SapphireEmu.Environment
                 _connection.encryptOutgoing = true;
             }
             _connection.connected = true;
-            EACManager.OnJoinGame(_connection);
             ConsoleSystem.Log(String.Format(Data.Base.Message.Network_Connection_NewConnection_Authed, _connection.userid, _connection.username));
         }
+        #endregion
     }
 }

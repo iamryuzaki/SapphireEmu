@@ -26,18 +26,23 @@ namespace SapphireEmu.Rust.GObject
         public Vector3 Rotation = Vector3.zero;
         public GameZona CurentGameZona = null;
         
+        // Which player is subscribed to me and view me
         public List<BasePlayer> ListViewToMe = new List<BasePlayer>();
 
-        public void Spawn(uint prefabID)
+        #region [Method] Spawn
+        public void Spawn(uint _prefabID)
         {
             m_LastNetworkableUID++;
             this.UID = m_LastNetworkableUID;
-            this.PrefabID = prefabID;
+            this.PrefabID = _prefabID;
             ListNetworkables[this.UID] = this;
+            if (this is BasePlayer player)
+                player.OnPlayerCreated();
             this.OnPositionChanged();
-            this.SendNetworkUpdate();
         }
+        #endregion
 
+        #region [Method] Despawn
         public void Despawn()
         {
             if (this.IsSpawned && ListNetworkables.TryGetValue(this.UID, out _))
@@ -52,33 +57,34 @@ namespace SapphireEmu.Rust.GObject
                 ListViewToMe.Clear();
             }
         }
+        #endregion
 
+        #region [Method] OnDestroy
         public override void OnDestroy()
         {
             this.Despawn();
         }
+        #endregion
 
         #region [Method] SendNetworkUpdate
-
-        public void SendNetworkUpdate(Entity entity = null)
+        public void SendNetworkUpdate(Entity _entity = null)
         {
             if (this.ListViewToMe.Count != 0)
             {
-                this.SendNetworkUpdate(new SendInfo(this.ListViewToMe.ToConnectionsList()));
+                this.SendNetworkUpdate(new SendInfo(this.ListViewToMe.ToConnectionsList()), _entity);
             }
         }
         
-        public virtual void SendNetworkUpdate(SendInfo sendInfo, Entity entity = null)
+        public virtual void SendNetworkUpdate(SendInfo _sendInfo, Entity _entity = null)
         {
-            ConsoleSystem.Log("SendNetworkUpdate");
-            if (entity == null)
-                entity = GetEntityProtobuf();
+            if (_entity == null)
+                _entity = GetEntityProtobuf();
             
-            #region [Section] Tempolary FIX
+            #region [Section] Temporary FIX - Alistair has promised to resolve the issue with connection.validate.entityUpdates
             
-            if (sendInfo.connection == null)
+            if (_sendInfo.connection == null)
             {
-                var connections = sendInfo.connections.ToArray();
+                var connections = _sendInfo.connections.ToArray();
                 for (var i = 0; i < connections.Length; i++)
                 {
                     connections[i].validate.entityUpdates++;
@@ -86,7 +92,7 @@ namespace SapphireEmu.Rust.GObject
                     NetworkManager.BaseNetworkServer.write.Start();
                     NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.Entities);
                     NetworkManager.BaseNetworkServer.write.UInt32(connections[i].validate.entityUpdates);
-                    entity.WriteToStream(NetworkManager.BaseNetworkServer.write);
+                    _entity.WriteToStream(NetworkManager.BaseNetworkServer.write);
                     NetworkManager.BaseNetworkServer.write.Send(new SendInfo(connections[i]));
                 }
                 return;
@@ -96,9 +102,9 @@ namespace SapphireEmu.Rust.GObject
             
             NetworkManager.BaseNetworkServer.write.Start();
             NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.Entities);
-            NetworkManager.BaseNetworkServer.write.UInt32(++sendInfo.connection.validate.entityUpdates);
-            entity.WriteToStream(NetworkManager.BaseNetworkServer.write);
-            NetworkManager.BaseNetworkServer.write.Send(sendInfo);
+            NetworkManager.BaseNetworkServer.write.UInt32(++_sendInfo.connection.validate.entityUpdates);
+            _entity.WriteToStream(NetworkManager.BaseNetworkServer.write);
+            NetworkManager.BaseNetworkServer.write.Send(_sendInfo);
         }
         #endregion
 
@@ -106,12 +112,13 @@ namespace SapphireEmu.Rust.GObject
 
         public void SendNetworkPositionUpdate()
         {
+            if (this is BasePlayer player && player.IsConnected)
+                this.SendNetworkPositionUpdate(new SendInfo(player.NetConnection));
+            
             if (this.ListViewToMe.Count != 0)
-            {
                 this.SendNetworkPositionUpdate(new SendInfo(ListViewToMe.ToConnectionsList()));
-            }
         }
-        public virtual void SendNetworkPositionUpdate(SendInfo sendInfo)
+        public virtual void SendNetworkPositionUpdate(SendInfo _sendInfo)
         {
             if (this.ListViewToMe.Count != 0)
             {
@@ -120,7 +127,7 @@ namespace SapphireEmu.Rust.GObject
                 NetworkManager.BaseNetworkServer.write.EntityID(this.UID);
                 NetworkManager.BaseNetworkServer.write.Vector3(this.Position);
                 NetworkManager.BaseNetworkServer.write.Vector3(this.Rotation);
-                NetworkManager.BaseNetworkServer.write.Send(sendInfo);
+                NetworkManager.BaseNetworkServer.write.Send(_sendInfo);
             }
         }
         #endregion
@@ -146,7 +153,7 @@ namespace SapphireEmu.Rust.GObject
             {
                 baseNetworkable = new ProtoBuf.BaseNetworkable
                 {
-                    @group = this.CurentGameZona.UID,
+                    @group = 0,
                     prefabID = this.PrefabID,
                     uid = this.UID
                 }

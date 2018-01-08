@@ -29,7 +29,6 @@ namespace SapphireEmu.Rust.ZonaManager
         {
             if (networkable.CurentGameZona == null || networkable.CurentGameZona != this)
             {
-                ConsoleSystem.Log($"GameZona_{X}_{Y}: Registration: Networkables count - " + this.ListNetworkablesInZona.Count);
                 if (networkable.CurentGameZona != null)
                 {
                     networkable.CurentGameZona.UnRegistration(networkable);
@@ -39,8 +38,8 @@ namespace SapphireEmu.Rust.ZonaManager
                     this.Teleportation(networkable);
 
                 ListNetworkablesInZona.Add(networkable);
-                if (networkable is BasePlayer && (networkable as BasePlayer).IsConnected && ListPlayersInZona.Contains(networkable as BasePlayer) == false)
-                    ListPlayersInZona.Add(networkable as BasePlayer);
+                if (networkable is BasePlayer player && player.IsConnected && ListPlayersInZona.Contains(player) == false)
+                    ListPlayersInZona.Add(player);
                 
                 networkable.CurentGameZona = this;
             }
@@ -50,10 +49,68 @@ namespace SapphireEmu.Rust.ZonaManager
         {
             if (this.ListNetworkablesInZona.Contains(networkable))
             {
-                ConsoleSystem.Log($"GameZona_{X}_{Y}: UnRegistration");
                 this.ListNetworkablesInZona.Remove(networkable);
-                if (networkable is BasePlayer && (networkable as BasePlayer).IsConnected)
-                    this.ListPlayersInZona.Remove((networkable as BasePlayer));
+                if (networkable is BasePlayer player && player.IsConnected)
+                    this.ListPlayersInZona.Remove(player);
+            }
+        }
+
+        private void Subscribe(BaseNetworkable networkable)
+        {
+            if (this.ListPlayersInZona.Count != 0)
+            {
+                for (var i1 = 0; i1 < this.ListPlayersInZona.Count; i1++)
+                {
+                    if (networkable.ListViewToMe.Contains(this.ListPlayersInZona[i1]) == false && this.ListPlayersInZona[i1] != networkable)
+                        networkable.ListViewToMe.Add(this.ListPlayersInZona[i1]);
+                }
+
+                networkable.SendNetworkUpdate(new SendInfo(this.ListPlayersInZona.ToConnectionsList()));
+            }
+                                
+            if (networkable is BasePlayer player && player.IsConnected)
+            {
+                for (var i1 = 0; i1 < this.ListNetworkablesInZona.Count; i1++)
+                {
+                    if (this.ListNetworkablesInZona[i1].ListViewToMe.Contains(player) == false)
+                    {
+                        this.ListNetworkablesInZona[i1].ListViewToMe.Add(player);
+                        this.ListNetworkablesInZona[i1].SendNetworkUpdate(new SendInfo(player.NetConnection));
+                    }
+                }
+            }
+        }
+
+        private void UnSubscribe(BaseNetworkable networkable)
+        {
+            if (this.ListPlayersInZona.Count != 0)
+            {
+                for (var i1 = 0; i1 < this.ListPlayersInZona.Count; i1++)
+                {
+                    if (networkable.ListViewToMe.Contains(this.ListPlayersInZona[i1]))
+                        networkable.ListViewToMe.Remove(this.ListPlayersInZona[i1]);
+                }
+
+                NetworkManager.BaseNetworkServer.write.Start();
+                NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.EntityDestroy);
+                NetworkManager.BaseNetworkServer.write.EntityID(networkable.UID);
+                NetworkManager.BaseNetworkServer.write.Send(new SendInfo(this.ListPlayersInZona.ToConnectionsList()));
+            }
+
+            if (networkable is BasePlayer player && player.IsConnected)
+            {
+                for (var i1 = 0; i1 < this.ListNetworkablesInZona.Count; i1++)
+                {
+                    if (this.ListNetworkablesInZona[i1].ListViewToMe.Contains(player))
+                    {
+                        this.ListNetworkablesInZona[i1].ListViewToMe.Remove(player);
+
+                        NetworkManager.BaseNetworkServer.write.Start();
+                        NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.EntityDestroy);
+                        NetworkManager.BaseNetworkServer.write.EntityID(this.ListNetworkablesInZona[i1].UID);
+                        NetworkManager.BaseNetworkServer.write.Send(new SendInfo(player.NetConnection));
+                    }
+                }
             }
         }
 
@@ -69,38 +126,11 @@ namespace SapphireEmu.Rust.ZonaManager
                     int unforward = changeX * -1 * Settings.MapZonesLine + networkable.CurentGameZona.X;
                     if (ZonaManager.IsInMap(unforward, networkable.CurentGameZona.Y))
                     {
-                        GameZona lastView;
                         int finishLine = networkable.CurentGameZona.Y + Settings.MapZonesLine;
                         int startLine = networkable.CurentGameZona.Y - Settings.MapZonesLine;
 
                         for (int i = startLine; i <= finishLine; i++)
-                        {
-                            if (ZonaManager.IsInMap(unforward, i))
-                            {
-                                lastView = ZonaManager.GetGameZona(unforward, i);
-                                if (lastView.ListPlayersInZona.Count != 0)
-                                {
-                                    for (var i1 = 0; i1 < lastView.ListPlayersInZona.Count; i1++)
-                                    {
-                                        if (networkable.ListViewToMe.Contains(lastView.ListPlayersInZona[i1]))
-                                            networkable.ListViewToMe.Remove(lastView.ListPlayersInZona[i1]);
-                                    }
-
-                                    NetworkManager.BaseNetworkServer.write.Start();
-                                    NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.EntityDestroy);
-                                    NetworkManager.BaseNetworkServer.write.EntityID(networkable.UID);
-                                    NetworkManager.BaseNetworkServer.write.Send(new SendInfo(lastView.ListPlayersInZona.ToConnectionsList()));
-                                }
-
-                                if (networkable is BasePlayer && (networkable as BasePlayer).IsConnected)
-                                {
-                                    NetworkManager.BaseNetworkServer.write.Start();
-                                    NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.GroupDestroy);
-                                    NetworkManager.BaseNetworkServer.write.EntityID(lastView.UID);
-                                    NetworkManager.BaseNetworkServer.write.Send(new SendInfo((networkable as BasePlayer).NetConnection));
-                                }
-                            }
-                        }
+                            ZonaManager.GetGameZona(unforward, i)?.UnSubscribe(networkable);
                     }
                 }
 
@@ -114,114 +144,35 @@ namespace SapphireEmu.Rust.ZonaManager
                         int startLine = networkable.CurentGameZona.X - Settings.MapZonesLine;
 
                         for (int i = startLine; i <= finishLine; i++)
-                        {
-                            if (ZonaManager.IsInMap(i, unforward))
-                            {
-                                lastView = ZonaManager.GetGameZona(i, unforward);
-                                if (lastView.ListPlayersInZona.Count != 0)
-                                {
-                                    for (var i1 = 0; i1 < lastView.ListPlayersInZona.Count; i1++)
-                                    {
-                                        if (networkable.ListViewToMe.Contains(lastView.ListPlayersInZona[i1]))
-                                            networkable.ListViewToMe.Remove(lastView.ListPlayersInZona[i1]);
-                                    }
-                                    
-                                    NetworkManager.BaseNetworkServer.write.Start();
-                                    NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.EntityDestroy);
-                                    NetworkManager.BaseNetworkServer.write.EntityID(networkable.UID);
-                                    NetworkManager.BaseNetworkServer.write.Send(new SendInfo(lastView.ListPlayersInZona.ToConnectionsList()));
-                                }
-
-                                if (networkable is BasePlayer && (networkable as BasePlayer).IsConnected)
-                                {
-                                    NetworkManager.BaseNetworkServer.write.Start();
-                                    NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.GroupDestroy);
-                                    NetworkManager.BaseNetworkServer.write.EntityID(lastView.UID);
-                                    NetworkManager.BaseNetworkServer.write.Send(new SendInfo((networkable as BasePlayer).NetConnection));
-                                }
-                            }
-                        }
+                            ZonaManager.GetGameZona(i, unforward)?.UnSubscribe(networkable);
                     }
-                }
-
-                if (networkable.ListViewToMe.Count != 0)
-                {
-                    NetworkManager.BaseNetworkServer.write.Start();
-                    NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.GroupChange);
-                    NetworkManager.BaseNetworkServer.write.EntityID(networkable.UID);
-                    NetworkManager.BaseNetworkServer.write.UInt32(this.UID);
-                    NetworkManager.BaseNetworkServer.write.Send(new SendInfo(networkable.ListViewToMe.ToConnectionsList()));
                 }
 
                 if (changeX != 0)
                 {
-                    int forward = changeX * Settings.MapZonesLine + networkable.CurentGameZona.X;
-                    if (ZonaManager.IsInMap(forward, networkable.CurentGameZona.Y))
+                    int forward = changeX * Settings.MapZonesLine + this.X;
+                    if (ZonaManager.IsInMap(forward, this.Y))
                     {
                         GameZona lastView;
-                        int finishLine = networkable.CurentGameZona.Y + Settings.MapZonesLine;
-                        int startLine = networkable.CurentGameZona.Y - Settings.MapZonesLine;
+                        int finishLine = this.Y + Settings.MapZonesLine;
+                        int startLine = this.Y - Settings.MapZonesLine;
 
                         for (int i = startLine; i <= finishLine; i++)
-                        {
-                            if (ZonaManager.IsInMap(forward, i))
-                            {
-                                lastView = ZonaManager.GetGameZona(forward, i);
-                                if (lastView.ListPlayersInZona.Count != 0)
-                                {
-                                    for (var i1 = 0; i1 < lastView.ListPlayersInZona.Count; i1++)
-                                    {
-                                        if (networkable.ListViewToMe.Contains(lastView.ListPlayersInZona[i1]) == false)
-                                            networkable.ListViewToMe.Add(lastView.ListPlayersInZona[i1]);
-                                    }
-
-                                    networkable.SendNetworkUpdate(new SendInfo(lastView.ListPlayersInZona.ToConnectionsList()));
-                                }
-                                
-                                if (networkable is BasePlayer && (networkable as BasePlayer).IsConnected)
-                                {
-                                    ConsoleSystem.Log($"GameZona_{X}_{Y}: Sync Object For X");
-                                    for (var i1 = 0; i1 < lastView.ListNetworkablesInZona.Count; i1++)
-                                        lastView.ListNetworkablesInZona[i1].SendNetworkUpdate(new SendInfo((networkable as BasePlayer).NetConnection));
-                                }
-                            }
-                        }
+                            ZonaManager.GetGameZona(forward, i)?.Subscribe(networkable);
                     }
                 }
 
                 if (changeY != 0)
                 {
-                    int forward = changeY * Settings.MapZonesLine + networkable.CurentGameZona.Y;
-                    if (ZonaManager.IsInMap(networkable.CurentGameZona.X, forward))
+                    int forward = changeY * Settings.MapZonesLine + this.Y;
+                    if (ZonaManager.IsInMap(this.X, forward))
                     {
                         GameZona lastView;
-                        int finishLine = networkable.CurentGameZona.X + Settings.MapZonesLine;
-                        int startLine = networkable.CurentGameZona.X - Settings.MapZonesLine;
+                        int finishLine = this.X + Settings.MapZonesLine;
+                        int startLine = this.X - Settings.MapZonesLine;
 
                         for (int i = startLine; i <= finishLine; i++)
-                        {
-                            if (ZonaManager.IsInMap(i, forward))
-                            {
-                                lastView = ZonaManager.GetGameZona(i, forward);
-                                if (lastView.ListPlayersInZona.Count != 0)
-                                {
-                                    for (var i1 = 0; i1 < lastView.ListPlayersInZona.Count; i1++)
-                                    {
-                                        if (networkable.ListViewToMe.Contains(lastView.ListPlayersInZona[i1]) == false)
-                                            networkable.ListViewToMe.Add(lastView.ListPlayersInZona[i1]);
-                                    }
-
-                                    networkable.SendNetworkUpdate(new SendInfo(lastView.ListPlayersInZona.ToConnectionsList()));
-                                }
-                                
-                                if (networkable is BasePlayer && (networkable as BasePlayer).IsConnected)
-                                {
-                                    ConsoleSystem.Log($"GameZona_{X}_{Y}: Sync Object For Y");
-                                    for (var i1 = 0; i1 < lastView.ListNetworkablesInZona.Count; i1++)
-                                        lastView.ListNetworkablesInZona[i1].SendNetworkUpdate(new SendInfo((networkable as BasePlayer).NetConnection));
-                                }
-                            }
-                        }
+                            ZonaManager.GetGameZona(i, forward)?.Subscribe(networkable);
                     }
                 }
             } else
@@ -230,104 +181,61 @@ namespace SapphireEmu.Rust.ZonaManager
 
         private void Teleportation(BaseNetworkable networkable)
         {
-            //TODO: Need rewrite tihs method... Need use ChangeGroup if dont need EntityDestroy =( By ~ TheRyuzaki
+            //TODO: Need rewrite tihs method... Need dont use EntityDestroy if new zona view this Entity =( By ~ TheRyuzaki
             
             if (networkable.CurentGameZona != null)
             {
-                if (networkable.ListViewToMe.Count != 0)
-                {
-                    NetworkManager.BaseNetworkServer.write.Start();
-                    NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.EntityDestroy);
-                    NetworkManager.BaseNetworkServer.write.EntityID(networkable.UID);
-                    NetworkManager.BaseNetworkServer.write.Send(new SendInfo(networkable.ListViewToMe.ToConnectionsList()));
-                }
+                int last_finishLineX = networkable.CurentGameZona.X + Settings.MapZonesLine;
+                int last_startLineX = networkable.CurentGameZona.X - Settings.MapZonesLine;
+                int last_finishLineY = networkable.CurentGameZona.Y + Settings.MapZonesLine;
+                int last_startLineY = networkable.CurentGameZona.Y - Settings.MapZonesLine;
 
-                networkable.ListViewToMe.Clear();
-
-                if (networkable is BasePlayer && (networkable as BasePlayer).IsConnected)
-                {
-                    
-                    int last_finishLineX = networkable.CurentGameZona.X + Settings.MapZonesLine;
-                    int last_startLineX = networkable.CurentGameZona.X - Settings.MapZonesLine;
-                    int last_finishLineY = networkable.CurentGameZona.Y + Settings.MapZonesLine;
-                    int last_startLineY = networkable.CurentGameZona.Y - Settings.MapZonesLine;
-
-                    GameZona lastZona;
-                    for (int x = last_startLineX; x <= last_finishLineX; x++)
-                    {
-                        for (int y = last_startLineY; y <= last_finishLineY; y++)
-                        {
-                            if (ZonaManager.IsInMap(x, y))
-                            {
-                                lastZona = ZonaManager.GetGameZona(x, y);
-                                
-                                NetworkManager.BaseNetworkServer.write.Start();
-                                NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.GroupDestroy);
-                                NetworkManager.BaseNetworkServer.write.EntityID(lastZona.UID);
-                                NetworkManager.BaseNetworkServer.write.Send(new SendInfo((networkable as BasePlayer).NetConnection));
-                            }
-                        }
-                    }
-                }
+                for (int x = last_startLineX; x <= last_finishLineX; x++)
+                    for (int y = last_startLineY; y <= last_finishLineY; y++)
+                        ZonaManager.GetGameZona(x, y)?.UnSubscribe(networkable); 
             }
             
             int finishLineX = this.X + Settings.MapZonesLine;
             int startLineX = this.X - Settings.MapZonesLine;
             int finishLineY = this.Y + Settings.MapZonesLine;
             int startLineY = this.Y - Settings.MapZonesLine;
-
-
-            GameZona newZona;
-            for (int x = startLineX; x < finishLineX; x++)
-            {
-                for (int y = startLineY; y < finishLineY; y++)
-                {
-                    if (ZonaManager.IsInMap(x, y))
-                    {
-                        newZona = ZonaManager.GetGameZona(x, y);
-                        for (var i = 0; i < newZona.ListPlayersInZona.Count; i++)
-                            networkable.ListViewToMe.Add(newZona.ListPlayersInZona[i]);
-                        
-                        if (networkable is BasePlayer && (networkable as BasePlayer).IsConnected)
-                        {
-                            for (var i1 = 0; i1 < newZona.ListNetworkablesInZona.Count; i1++)
-                                newZona.ListNetworkablesInZona[i1].SendNetworkUpdate(new SendInfo((networkable as BasePlayer).NetConnection));
-                        }
-                    }
-                }
-            }
             
-            if (networkable.ListViewToMe.Count != 0 && networkable.CurentGameZona != null)
-                networkable.SendNetworkUpdate();
+            for (int x = startLineX; x <= finishLineX; x++)
+                for (int y = startLineY; y <= finishLineY; y++)
+                    ZonaManager.GetGameZona(x, y)?.Subscribe(networkable);
         }
 
-        public void OnReceivingDataFromZona(BasePlayer player)
+        public void OnReceivingNetworkablesFromView(BasePlayer player)
         {
             int last_finishLineX = this.X + Settings.MapZonesLine;
             int last_startLineX = this.X - Settings.MapZonesLine;
             int last_finishLineY = this.Y + Settings.MapZonesLine;
             int last_startLineY = this.Y - Settings.MapZonesLine;
 
-            GameZona lastZona;
+            GameZona gameZona;
             for (int x = last_startLineX; x <= last_finishLineX; x++)
             {
                 for (int y = last_startLineY; y <= last_finishLineY; y++)
                 {
-                    if (ZonaManager.IsInMap(x, y))
+                    gameZona = ZonaManager.GetGameZona(x, y);
+                    if (gameZona != null)
                     {
-                        lastZona = ZonaManager.GetGameZona(x, y);
-                        for (var i = 0; i < lastZona.ListNetworkablesInZona.Count; i++)
+                        for (var i = 0; i < gameZona.ListNetworkablesInZona.Count; i++)
                         {
-                            if (lastZona.ListNetworkablesInZona[i].ListViewToMe.Contains(player) == false)
+                            if (gameZona.ListNetworkablesInZona[i].ListViewToMe.Contains(player) == false && gameZona.ListNetworkablesInZona[i] != player)
                             {
-                                lastZona.ListNetworkablesInZona[i].ListViewToMe.Add(player);
-                                lastZona.ListNetworkablesInZona[i].SendNetworkUpdate(new SendInfo(player.NetConnection));
+                                gameZona.ListNetworkablesInZona[i].ListViewToMe.Add(player);
+                                gameZona.ListNetworkablesInZona[i].SendNetworkUpdate(new SendInfo(player.NetConnection));
                             }
                         }
                     }
+
                 }
             }
-            
+        }
+
+        public void OnReconnectedPlayer(BasePlayer player)
+        {
             if (this.ListPlayersInZona.Contains(player) == false)
                 this.ListPlayersInZona.Add(player);
         }
