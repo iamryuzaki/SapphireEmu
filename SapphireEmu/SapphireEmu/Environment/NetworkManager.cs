@@ -63,7 +63,7 @@ namespace SapphireEmu.Environment
             EACManager.OnLeaveGame(_connection);
             BasePlayer player = Extended.Rust.ToPlayer(_connection);
             if (player != null)
-                player.OnDisconnected();
+                player.Network.OnDisconnected();
             ConsoleSystem.Log(string.Format(Data.Base.Message.Network_Connection_NewDisconnected, _connection.userid, _connection.username, _reasone));
         }
         #endregion
@@ -134,10 +134,7 @@ namespace SapphireEmu.Environment
         private void OnPlayerTick(Message _message)
         {
             BasePlayer player = Extended.Rust.ToPlayer(_message);
-            if (player != null)
-            {
-                player.OnReceivedTick(_message);
-            }
+            player?.Network.OnReceivedTick(_message);
         }
         #endregion
 
@@ -168,7 +165,7 @@ namespace SapphireEmu.Environment
                     BasePlayer.ListPlayers.Add(player.SteamID, player);
                 }
                 
-                player.OnConnected(_message.connection); 
+                player.Network.OnConnected(_message.connection); 
             }
         }
         #endregion

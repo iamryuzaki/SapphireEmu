@@ -16,6 +16,11 @@ namespace SapphireEmu.Rust.GObject
     public class BaseNetworkable : SapphireType
     {
         public static Dictionary<UInt32, BaseNetworkable> ListNetworkables = new Dictionary<uint, BaseNetworkable>();
+        public static UInt32 TakeUID()
+        {
+            m_LastNetworkableUID++;
+            return m_LastNetworkableUID;
+        }
         private static UInt32 m_LastNetworkableUID = 0;
         
         public UInt32 UID { get; private set; } = 0;
@@ -32,12 +37,11 @@ namespace SapphireEmu.Rust.GObject
         #region [Method] Spawn
         public void Spawn(uint _prefabID)
         {
-            m_LastNetworkableUID++;
-            this.UID = m_LastNetworkableUID;
+            this.UID = TakeUID();
             this.PrefabID = _prefabID;
             ListNetworkables[this.UID] = this;
             if (this is BasePlayer player)
-                player.OnPlayerCreated();
+                player.Network.OnPlayerCreated();
             this.OnPositionChanged();
         }
         #endregion
@@ -69,10 +73,12 @@ namespace SapphireEmu.Rust.GObject
         #region [Method] SendNetworkUpdate
         public void SendNetworkUpdate(Entity _entity = null)
         {
+            if (this is BasePlayer player && player.IsConnected)
+                this.SendNetworkUpdate(new SendInfo(player.Network.NetConnection));
+            
             if (this.ListViewToMe.Count != 0)
-            {
                 this.SendNetworkUpdate(new SendInfo(this.ListViewToMe.ToConnectionsList()), _entity);
-            }
+            
         }
         
         public virtual void SendNetworkUpdate(SendInfo _sendInfo, Entity _entity = null)
@@ -113,7 +119,7 @@ namespace SapphireEmu.Rust.GObject
         public void SendNetworkPositionUpdate()
         {
             if (this is BasePlayer player && player.IsConnected)
-                this.SendNetworkPositionUpdate(new SendInfo(player.NetConnection));
+                this.SendNetworkPositionUpdate(new SendInfo(player.Network.NetConnection));
             
             if (this.ListViewToMe.Count != 0)
                 this.SendNetworkPositionUpdate(new SendInfo(ListViewToMe.ToConnectionsList()));

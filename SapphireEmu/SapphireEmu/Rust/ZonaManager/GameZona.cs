@@ -75,7 +75,7 @@ namespace SapphireEmu.Rust.ZonaManager
                     if (this.ListNetworkablesInZona[i1].ListViewToMe.Contains(player) == false)
                     {
                         this.ListNetworkablesInZona[i1].ListViewToMe.Add(player);
-                        this.ListNetworkablesInZona[i1].SendNetworkUpdate(new SendInfo(player.NetConnection));
+                        this.ListNetworkablesInZona[i1].SendNetworkUpdate(new SendInfo(player.Network.NetConnection));
                     }
                 }
             }
@@ -108,7 +108,7 @@ namespace SapphireEmu.Rust.ZonaManager
                         NetworkManager.BaseNetworkServer.write.Start();
                         NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.EntityDestroy);
                         NetworkManager.BaseNetworkServer.write.EntityID(this.ListNetworkablesInZona[i1].UID);
-                        NetworkManager.BaseNetworkServer.write.Send(new SendInfo(player.NetConnection));
+                        NetworkManager.BaseNetworkServer.write.Send(new SendInfo(player.Network.NetConnection));
                     }
                 }
             }
@@ -225,7 +225,7 @@ namespace SapphireEmu.Rust.ZonaManager
                             if (gameZona.ListNetworkablesInZona[i].ListViewToMe.Contains(player) == false && gameZona.ListNetworkablesInZona[i] != player)
                             {
                                 gameZona.ListNetworkablesInZona[i].ListViewToMe.Add(player);
-                                gameZona.ListNetworkablesInZona[i].SendNetworkUpdate(new SendInfo(player.NetConnection));
+                                gameZona.ListNetworkablesInZona[i].SendNetworkUpdate(new SendInfo(player.Network.NetConnection));
                             }
                         }
                     }

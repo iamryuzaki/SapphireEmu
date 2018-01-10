@@ -47,6 +47,7 @@ namespace SapphireEmu.Data.Base
                 Assist = 540658179, // само поднятия
                 StartReload = 3302290555, //начало перезарядки
                 Reload = 3360326041, //конец перезарядки
+                DirectionalDamage = 4047348697,
             }
             #endregion
         }

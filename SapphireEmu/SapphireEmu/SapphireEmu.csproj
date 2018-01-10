@@ -34,11 +34,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Bootstrap.cs" />
+    <Compile Include="Data\Base\GObject\Component\E_AllowedContentsType.cs" />
+    <Compile Include="Data\Base\GObject\Component\E_ItemContainerType.cs" />
+    <Compile Include="Data\Base\GObject\Component\E_ItemFlags.cs" />
+    <Compile Include="Data\Base\GObject\E_DamageType.cs" />
     <Compile Include="Data\Base\GObject\E_EntityFlags.cs" />
     <Compile Include="Data\Base\GObject\E_LifeState.cs" />
     <Compile Include="Data\Base\GObject\E_PlayerButton.cs" />
     <Compile Include="Data\Base\GObject\E_PlayerFlags.cs" />
     <Compile Include="Data\Base\GObject\E_PlayerModelState.cs" />
+    <Compile Include="Data\Base\ItemID.cs" />
     <Compile Include="Data\Base\Message.cs" />
     <Compile Include="Data\Base\Network.cs" />
     <Compile Include="Data\Base\PrefabID.cs" />
@@ -56,6 +61,10 @@
     <Compile Include="Rust\GObject\BaseEntity.cs" />
     <Compile Include="Rust\GObject\BaseNetworkable.cs" />
     <Compile Include="Rust\GObject\BasePlayer.cs" />
+    <Compile Include="Rust\GObject\Component\BasePlayerNetwork.cs" />
+    <Compile Include="Rust\GObject\Component\Item.cs" />
+    <Compile Include="Rust\GObject\Component\ItemContainer.cs" />
+    <Compile Include="Rust\GObject\Component\BasePlayerInventory.cs" />
     <Compile Include="Rust\ZonaManager\GameZona.cs" />
     <Compile Include="Rust\ZonaManager\ZonaManager.cs" />
     <Compile Include="Struct\Network\UserGiveInformation.cs" />

@@ -12,7 +12,7 @@ namespace SapphireEmu.Extended
             Connection[] listConnections = new Connection[listPlayers.Count];
 
             for (var i = 0; i < listPlayers.Count; i++)
-                listConnections[i] = listPlayers[i].NetConnection;
+                listConnections[i] = listPlayers[i].Network.NetConnection;
             
             return listConnections;
         }

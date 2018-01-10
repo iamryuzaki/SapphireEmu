@@ -21,5 +21,6 @@ namespace SapphireEmu.Data.Base.GObject
         ThirdPersonViewmode = 1024,
         VoiceMuted = 512,
         Wounded = 64
+        
     }
 }
