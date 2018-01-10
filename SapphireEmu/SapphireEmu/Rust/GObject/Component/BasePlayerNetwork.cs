@@ -49,14 +49,14 @@ namespace SapphireEmu.Rust.GObject.Component
         #region [Method] OnPlayerCreated
         public void OnPlayerCreated()
         {
+            this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem((int)ItemID.Rock, 1));
+            this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem((int)ItemID.Torch, 1));
+            
             if (this.PlayerOwner.IsConnected)
             {
                 this.PlayerOwner.SendNetworkUpdate(new SendInfo(this.NetConnection));
                 this.PlayerOwner.ClientRPCEx(new SendInfo(this.NetConnection), null, Data.Base.Network.RPCMethod.ERPCMethodType.StartLoading);
             }
-
-            Item.CreateItem((int) ItemID.Rock, this.PlayerOwner.Inventory.ContainerBelt);
-            Item.CreateItem((int) ItemID.Torch, this.PlayerOwner.Inventory.ContainerBelt);
         }
         #endregion
 

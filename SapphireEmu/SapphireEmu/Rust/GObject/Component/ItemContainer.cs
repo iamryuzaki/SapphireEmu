@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SapphireEmu.Data.Base.GObject.Component;
+using SapphireEngine;
 
 namespace SapphireEmu.Rust.GObject.Component
 {
@@ -51,7 +52,7 @@ namespace SapphireEmu.Rust.GObject.Component
         public int GetFirstEmptySlot()
         {
             for (int i = 0; i < this.Capacity; i++)
-                if (ListSlots.TryGetValue(i, out var item))
+                if (ListSlots.TryGetValue(i, out _) == false)
                     return i;
             return -1;
         }
@@ -61,10 +62,12 @@ namespace SapphireEmu.Rust.GObject.Component
             if (this.HasEmtptySlot())
             {
                 int slot = this.GetFirstEmptySlot();
+                
                 this.ListItems.Add(item);
                 this.ListSlots[slot] = item;
                 item.Container = this;
                 item.Position = slot;
+                
                 return true;
             }
             return false;
@@ -86,7 +89,21 @@ namespace SapphireEmu.Rust.GObject.Component
 
         public ProtoBuf.ItemContainer GetProtobufObject()
         {
-            ProtoBuf.ItemContainer container = new ProtoBuf.ItemContainer();
+            List<ProtoBuf.Item> listItems = new List<ProtoBuf.Item>();
+            for (var i = 0; i < ListItems.Count; i++)
+                listItems.Add(ListItems[i].GetProtobufObject());
+            
+            ProtoBuf.ItemContainer container = new ProtoBuf.ItemContainer
+            {
+                allowedContents = 1,
+                allowedItem = 0,
+                availableSlots = new List<int>(),
+                contents = listItems,
+                flags = (int)this.ItemContainerType,
+                maxStackSize = 0,
+                slots = this.Capacity,
+                temperature = 30f
+            };
 
             return container;
         }
