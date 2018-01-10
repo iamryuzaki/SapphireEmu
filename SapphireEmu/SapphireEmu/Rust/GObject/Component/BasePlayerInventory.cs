@@ -25,8 +25,13 @@ namespace SapphireEmu.Rust.GObject.Component
 
         public ProtoBuf.PlayerInventory GetProtobufObject()
         {
-            ProtoBuf.PlayerInventory inventory = new PlayerInventory();
-
+            ProtoBuf.PlayerInventory inventory = new PlayerInventory
+            {
+                invBelt = this.ContainerBelt.GetProtobufObject(),
+                invWear = this.ContainerWear.GetProtobufObject(),
+                invMain = this.ContainerMain.GetProtobufObject(),
+            };
+            
             return inventory;
         }
     }

@@ -6,7 +6,7 @@ namespace SapphireEmu.Data
     {
         public const string ApplicationName = "SapphireEmu";
         public const string ApplicationVersion = "0.0.3";
-        public const int ApplicationBuild = 104;
+        public const int ApplicationBuild = 105;
 
         public const string Author = "TheRyuzaki";
         public const string Thanks = "KosiakS";
