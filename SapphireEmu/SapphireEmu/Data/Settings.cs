@@ -14,7 +14,7 @@ namespace SapphireEmu.Data
 
         public static string Hostname = "[SapphireEmu] No Name Server";
         public static int Maxplayers = 32;
-        public static string MapName = "HapisIsland";
+        public static string MapName = "CraggyIsland";
         public static int MapSeed = 1;
         public static int MapSize = 4096;
 
