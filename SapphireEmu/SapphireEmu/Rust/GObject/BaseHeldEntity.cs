@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using Network;
+﻿using Network;
 using ProtoBuf;
-using SapphireEmu.Data.Base.GObject;
 using SapphireEmu.Extended;
+using SapphireEmu.Data.Base.GObject;
 using SapphireEngine;
+using Message = Network.Message;
 
 namespace SapphireEmu.Rust.GObject
 {
@@ -57,5 +57,29 @@ namespace SapphireEmu.Rust.GObject
             if (this.ListViewToMe.Count != 0)
                 this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.ListViewToMe.ToConnectionsList()), _entity);
         }
+
+        #region [Method] OnRPC_OnPlayerAttack
+        // TODO: Move To BaseMelee
+        [Data.Base.Network.RPCMethod(Data.Base.Network.RPCMethod.ERPCMethodType.PlayerAttack)]
+        void OnRPC_OnPlayerAttack(Message packet)
+        {
+            BasePlayer player = packet.ToPlayer();
+            using (PlayerAttack playerAttack = PlayerAttack.Deserialize(packet.read))
+            {
+                if (Find(playerAttack.attack.hitID, out BaseEntity hitEntity))
+                {
+                    if (hitEntity is BaseCombatEntity hitCombatEntity)
+                    {
+                        Component.Item ActiveItem = player.ActiveItem;
+                        if (ActiveItem.Information.CanHeldEntity)
+                        {
+                            hitCombatEntity.Hurt(ActiveItem.Information.Damage);
+                            ConsoleSystem.Log($"Damage: {ActiveItem.Information.Damage}, new hp {hitCombatEntity.Health}");
+                        } else ConsoleSystem.LogError($"[{nameof(OnRPC_OnPlayerAttack)}][NOT HELD ENTITY] Trying hit from <{ActiveItem.Information.ItemID}>");
+                    }
+                }
+            }
+        }
+        #endregion
     }
 }

@@ -13,6 +13,7 @@ using SapphireEngine.Functions;
 using UnityEngine;
 using BaseNetworkable = SapphireEmu.Rust.GObject.BaseNetworkable;
 using BasePlayer = SapphireEmu.Rust.GObject.BasePlayer;
+using Item = SapphireEmu.Rust.GObject.Component.Item;
 using Message = Network.Message;
 using Server = Facepunch.Network.Raknet.Server;
 
@@ -154,11 +155,15 @@ namespace SapphireEmu.Environment
                 {
                     player = this.AddType<BasePlayer>();
                     player.SteamID = _message.connection.userid;
-                    player.Position = new Vector3(0,215,0);
+                    player.Position = new Vector3(0,10,0);
                     BasePlayer.ListPlayers.Add(player.SteamID, player);
                 }
-                
-                player.Network.OnConnected(_message.connection); 
+                player.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.RifleAk));
+                player.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.BoltRifle));
+                player.Network.OnConnected(_message.connection);
+                BasePlayer player2 = Framework.Bootstraper.AddType<BasePlayer>();
+                player2.Position =  new Vector3(0,10,0);
+                player2.Spawn((uint)PrefabID.BasePlayer);
             }
         }
         #endregion

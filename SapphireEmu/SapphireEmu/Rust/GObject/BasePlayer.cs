@@ -4,6 +4,7 @@ using System.Linq;
 using Facepunch.Extend;
 using Network;
 using ProtoBuf;
+using SapphireEmu.Data.Base;
 using SapphireEmu.Data.Base.GObject;
 using SapphireEmu.Environment;
 using SapphireEmu.Rust.GObject.Component;
@@ -11,6 +12,7 @@ using SapphireEngine;
 using UnityEngine;
 using Item = ProtoBuf.Item;
 using ItemContainer = SapphireEmu.Rust.GObject.Component.ItemContainer;
+using Message = Network.Message;
 
 namespace SapphireEmu.Rust.GObject
 {
@@ -264,6 +266,27 @@ namespace SapphireEmu.Rust.GObject
                     ConsoleSystem.LogWarning("[BasePlayer.OnRPC_MoveItem]: Detected movie enemy item to container!");
             }
         }
+
+        #region [Method] OnRPC_OnProjectileAttack
+        [Data.Base.Network.RPCMethod(Data.Base.Network.RPCMethod.ERPCMethodType.OnProjectileAttack)]
+        void OnRPC_OnProjectileAttack(Message packet)
+        {
+            PlayerProjectileAttack ppAttack = PlayerProjectileAttack.Deserialize(packet.read);
+            PlayerAttack playerAttack = ppAttack.playerAttack;
+            if (Find(playerAttack.attack.hitID, out BaseEntity hitEntity))
+            {
+                if (hitEntity is BaseCombatEntity hitCombatEntity)
+                {
+                    ItemID hitItem = (ItemID)playerAttack.attack.hitItem;
+                    
+                    if (ItemInformation.ListPrefabsFromItemIds.TryGetValue(hitItem, out ItemInformation hitItemInfo))
+                    {
+                        hitCombatEntity.Hurt(hitItemInfo.Damage);
+                    }
+                }
+            }
+        }
+        #endregion
         
         #region [Method] OnRPC_OnPlayerLanded
         [Data.Base.Network.RPCMethod(Data.Base.Network.RPCMethod.ERPCMethodType.OnPlayerLanded)]
