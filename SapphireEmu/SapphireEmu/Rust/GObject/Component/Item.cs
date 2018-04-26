@@ -34,6 +34,8 @@ namespace SapphireEmu.Rust.GObject.Component
                 ListItemsInWorld[this.UID] = this;
                 
                 this.Information = itemInformation;
+
+                this.Condition = this.Information.MaxCondition;
                 
                 if (_amount <= 0)
                     this.Amount = 1;
@@ -46,6 +48,7 @@ namespace SapphireEmu.Rust.GObject.Component
                 {
                     this.HeldEntity = Framework.Bootstraper.AddType<BaseHeldEntity>();
                     this.HeldEntity.ItemOwner = this;
+                    this.HeldEntity.IsComponent = true;
                     this.HeldEntity.Spawn((uint)this.Information.PrefabUID);
                 }
             }

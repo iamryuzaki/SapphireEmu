@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Network;
+using ProtoBuf;
 using SapphireEmu.Data.Base.GObject.Component;
+using SapphireEmu.Extended;
 using SapphireEngine;
 
 namespace SapphireEmu.Rust.GObject.Component
@@ -49,7 +52,17 @@ namespace SapphireEmu.Rust.GObject.Component
 
         public void OnItemConainerUpdate()
         {
-            
+            if (this.EntityOwner is BasePlayer playerOwner)
+            {
+                UpdateItemContainer container = new UpdateItemContainer
+                {
+                    container = new List<ProtoBuf.ItemContainer> {this.GetProtobufObject()},
+                    type = (this.HasFlag(E_ItemContainerType.Belt) ? 1 : (this.HasFlag(E_ItemContainerType.Clothing) ? 2 : 0))
+                };
+                playerOwner.ClientRPCEx<UpdateItemContainer>(new SendInfo(playerOwner.Network.NetConnection),null, Data.Base.Network.RPCMethod.ERPCMethodType.UpdatedItemContainer, container);
+                if (this.HasFlag(E_ItemContainerType.Clothing) || this.HasFlag(E_ItemContainerType.Belt))
+                    playerOwner.ClientRPCEx<UpdateItemContainer>(new SendInfo(playerOwner.ListViewToMe.ToConnectionsList()),null, Data.Base.Network.RPCMethod.ERPCMethodType.UpdatedItemContainer, container);
+            }
         }
 
         public bool HasEmtptySlot() => this.ListSlots.Count < this.Capacity;
@@ -93,6 +106,28 @@ namespace SapphireEmu.Rust.GObject.Component
             return false;
         }
 
+        public bool ChangeItemSlotFromContainer(Item item, int newSlot)
+        {
+            if (ListSlots.TryGetValue(item.PositionInContainer, out Item targetItem) && targetItem == item)
+            {
+                if (targetItem.PositionInContainer != newSlot)
+                {
+                    ListSlots.Remove(item.PositionInContainer);
+                    if (this.ListSlots.TryGetValue(newSlot, out Item lastItem))
+                    {
+                        lastItem.PositionInContainer = item.PositionInContainer;
+                        ListSlots[item.PositionInContainer] = lastItem;
+                    }
+
+                    ListSlots[newSlot] = item;
+                    item.PositionInContainer = newSlot;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
 
         public ProtoBuf.ItemContainer GetProtobufObject()
         {
@@ -109,7 +144,8 @@ namespace SapphireEmu.Rust.GObject.Component
                 flags = (int)this.ItemContainerType,
                 maxStackSize = 0,
                 slots = this.Capacity,
-                temperature = 30f
+                temperature = 30f,
+                UID = this.UID
             };
 
             return container;

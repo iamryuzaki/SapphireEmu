@@ -30,7 +30,8 @@ namespace SapphireEmu.Rust.GObject
         public Vector3 Position = Vector3.zero;
         public Vector3 Rotation = Vector3.zero;
         public GameZona CurentGameZona = null;
-        
+        public Boolean IsComponent { get; set; } = false;
+
         // Which player is subscribed to me and view me
         public List<BasePlayer> ListViewToMe = new List<BasePlayer>();
 
@@ -41,8 +42,10 @@ namespace SapphireEmu.Rust.GObject
             this.PrefabID = _prefabID;
             ListNetworkables[this.UID] = this;
             if (this is BasePlayer player)
-                player.Network.OnPlayerCreated();
-            this.OnPositionChanged();
+                player.Network.OnPlayerInit();
+            
+            if (this.IsComponent == false)
+                this.OnPositionChanged();
         }
         #endregion
 
@@ -71,14 +74,13 @@ namespace SapphireEmu.Rust.GObject
         #endregion
 
         #region [Method] SendNetworkUpdate
-        public void SendNetworkUpdate(Entity _entity = null)
+        public virtual void SendNetworkUpdate(Entity _entity = null)
         {
             if (this is BasePlayer player && player.IsConnected)
                 this.SendNetworkUpdate(new SendInfo(player.Network.NetConnection));
             
             if (this.ListViewToMe.Count != 0)
-                this.SendNetworkUpdate(new SendInfo(this.ListViewToMe.ToConnectionsList()), _entity);
-            
+                this.SendNetworkUpdate(new SendInfo(this.ListViewToMe.ToConnectionsList()), _entity); 
         }
         
         public virtual void SendNetworkUpdate(SendInfo _sendInfo, Entity _entity = null)

@@ -22,7 +22,7 @@ namespace SapphireEmu.Rust.ZonaManager
         {
             this.X = x;
             this.Y = y;
-            this.UID = (uint)(x + y);
+            this.UID = (uint)(x + 1000 + y);
         }
 
         public void Registration(BaseNetworkable networkable)

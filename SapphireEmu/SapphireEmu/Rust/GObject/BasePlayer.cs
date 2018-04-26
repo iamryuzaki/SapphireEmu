@@ -70,6 +70,10 @@ namespace SapphireEmu.Rust.GObject
         
         public override Entity GetEntityProtobuf()
         {
+            for (var i = 0; i < this.Inventory.ContainerBelt.ListItems.Count; i++)
+                if (this.Inventory.ContainerBelt.ListItems[i].HeldEntity != null)
+                    this.Inventory.ContainerBelt.ListItems[i].HeldEntity.SendNetworkUpdate();
+            
             return new Entity
             {
                 baseNetworkable = new ProtoBuf.BaseNetworkable
@@ -181,6 +185,7 @@ namespace SapphireEmu.Rust.GObject
         #region [Methods] Start and Stop Sleeping
         public void SendSleepingStart()
         {
+            this.OnChangeActiveItem(null);
             this.SetPlayerFlag(E_PlayerFlags.Sleeping, true);
             this.PlayerModelState = E_PlayerModelState.Sleeping;
             this.SendNetworkUpdate_PlayerFlags();
@@ -217,12 +222,46 @@ namespace SapphireEmu.Rust.GObject
             uint itemid = packet.read.UInt32();
             if (Component.Item.ListItemsInWorld.TryGetValue(itemid, out Component.Item itemTarget))
             {
-                uint newContainerUID = packet.read.UInt32();
-                if (ItemContainer.ListContainers.TryGetValue(newContainerUID, out ItemContainer containerTarget))
+                if (itemTarget.Container == null || itemTarget.Container.EntityOwner == this)
                 {
-                    int slot = packet.read.Int8();
-                    int amount = packet.read.UInt16();
+                    uint newContainerUID = packet.read.UInt32();
+                    if (ItemContainer.ListContainers.TryGetValue(newContainerUID, out ItemContainer containerTarget))
+                    {
+                        if (containerTarget.EntityOwner == this)
+                        {
+                            int slot = packet.read.Int8();
+                            int amount = packet.read.UInt16();
+
+                            // TODO: Need release split system
+                            
+                            if (itemTarget.Container != containerTarget)
+                            {
+                                if (itemTarget.Container != null)
+                                {
+                                    ItemContainer lastContainer = itemTarget.Container;
+                                    int lastPositon = itemTarget.PositionInContainer;
+                                    lastContainer.RemoveItemFromContainer(itemTarget);
+                                    
+                                    if (containerTarget.ListSlots.TryGetValue(slot, out Component.Item itemInNewPosition))
+                                    {
+                                        containerTarget.RemoveItemFromContainer(itemInNewPosition);
+                                        lastContainer.AddItemToContainer(itemInNewPosition, lastPositon);
+                                    }
+                                    lastContainer.OnItemConainerUpdate();
+                                }
+                               
+                                if (containerTarget.AddItemToContainer(itemTarget, slot))
+                                    containerTarget.OnItemConainerUpdate();
+                            }
+                            else if (itemTarget.Container.ChangeItemSlotFromContainer(itemTarget, slot))
+                                itemTarget.Container.OnItemConainerUpdate();
+                        }
+                        else
+                            ConsoleSystem.LogWarning("[BasePlayer.OnRPC_MoveItem]: Detected movie item to enemy container!");
+                    }
                 }
+                else
+                    ConsoleSystem.LogWarning("[BasePlayer.OnRPC_MoveItem]: Detected movie enemy item to container!");
             }
         }
         
@@ -261,6 +300,21 @@ namespace SapphireEmu.Rust.GObject
         #endregion   
         
         #endregion
-        
+
+        public void OnChangeActiveItem(Component.Item newItem)
+        {
+            if (this.ActiveItem?.HeldEntity != null)
+            {
+                this.ActiveItem.HeldEntity.SetHeld(false);
+                this.ActiveItem.HeldEntity.SendNetworkUpdate();
+            }
+
+            this.ActiveItem = newItem;
+            if (this.ActiveItem?.HeldEntity != null)
+            {
+                this.ActiveItem.HeldEntity.SetHeld(true);
+                this.ActiveItem.HeldEntity.SendNetworkUpdate();
+            }
+        }
     }
 }
