@@ -1,7 +1,7 @@
-﻿using System.Linq;
+﻿using Network;
 using ProtoBuf;
-using SapphireEmu.Data.Base;
 using SapphireEmu.Extended;
+using SapphireEmu.Data.Base.GObject;
 using SapphireEngine;
 using Message = Network.Message;
 
@@ -10,7 +10,7 @@ namespace SapphireEmu.Rust.GObject
     public class BaseHeldEntity : BaseEntity
     {
         public SapphireEmu.Rust.GObject.Component.Item ItemOwner { get; set; }
-        public BaseEntity EntityOwner => this.ItemOwner.Container?.EntityOwner;
+        public BasePlayer PlayerOwner => (BasePlayer)this.ItemOwner.Container?.EntityOwner;
 
         public override Entity GetEntityProtobuf()
         {
@@ -24,8 +24,8 @@ namespace SapphireEmu.Rust.GObject
                 },
                 baseEntity = new ProtoBuf.BaseEntity
                 {
-                    flags = (int) this.EntityFlags,
-                    pos = this.Position,
+                    flags = (int)this.EntityFlags,
+                    pos = this.PlayerOwner.Position,
                     rot = this.Rotation
                 },
                 heldEntity = new HeldEntity
@@ -34,9 +34,28 @@ namespace SapphireEmu.Rust.GObject
                 },
                 parent = new ParentInfo
                 {
-                    uid = this.EntityOwner?.UID ?? 0
+                    uid = this.PlayerOwner.UID,
+                    bone = 3354652700
                 }
             };
+        }
+        
+        
+        public void SetHeld(bool bHeld)
+        {
+            base.SetFlag(E_EntityFlags.Reserved4, bHeld);
+            base.SetFlag(E_EntityFlags.Disabled, !bHeld);
+        }
+
+
+
+        public override void SendNetworkUpdate(Entity _entity = null)
+        {
+            if (this.PlayerOwner != null && this.PlayerOwner.IsConnected)
+                this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.Network.NetConnection));
+            
+            if (this.ListViewToMe.Count != 0)
+                this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.ListViewToMe.ToConnectionsList()), _entity);
         }
 
         #region [Method] OnRPC_OnPlayerAttack

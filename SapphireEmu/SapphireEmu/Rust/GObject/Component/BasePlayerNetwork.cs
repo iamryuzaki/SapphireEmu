@@ -34,13 +34,18 @@ namespace SapphireEmu.Rust.GObject.Component
 
             if (this.PlayerOwner.UID != 0)
             {
-                this.OnPlayerCreated();
+                this.OnPlayerInit();
                 this.PlayerOwner.CurentGameZona.OnReceivingNetworkablesFromView(this.PlayerOwner);
                 this.PlayerOwner.CurentGameZona.OnReconnectedPlayer(this.PlayerOwner); 
             }
             else
+            {
                 this.PlayerOwner.Spawn((uint) Data.Base.PrefabID.BasePlayer);
-            
+                this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.Rock));
+                this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.Torch));
+                this.PlayerOwner.Inventory.ContainerBelt.OnItemConainerUpdate();
+            }
+
             this.PlayerOwner.ClientRPCEx(new SendInfo(this.NetConnection), null, Data.Base.Network.RPCMethod.ERPCMethodType.FinishLoading);
             this.PlayerOwner.SetPlayerFlag(E_PlayerFlags.ReceivingSnapshot, false);
             this.PlayerOwner.SendNetworkUpdate_PlayerFlags(new SendInfo(this.NetConnection));
@@ -48,11 +53,8 @@ namespace SapphireEmu.Rust.GObject.Component
         #endregion
 
         #region [Method] OnPlayerCreated
-        public void OnPlayerCreated()
+        public void OnPlayerInit()
         {
-            this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.Rock));
-            this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.Torch));
-            
             if (this.PlayerOwner.IsConnected)
             {
                 this.PlayerOwner.SendNetworkUpdate(new SendInfo(this.NetConnection));
@@ -102,13 +104,7 @@ namespace SapphireEmu.Rust.GObject.Component
             {
                 if (this.PlayerOwner.ActiveItem?.UID != msg.activeItem)
                 {
-                    if (msg.activeItem != 0)
-                    {
-                        if (Item.ListItemsInWorld.TryGetValue(msg.activeItem, out Item item))
-                            this.PlayerOwner.ActiveItem = item;
-                    }
-                    else
-                        this.PlayerOwner.ActiveItem = null;
+                    this.PlayerOwner.OnChangeActiveItem(Item.ListItemsInWorld.TryGetValue(msg.activeItem, out Item item) ? item : null);
                     needUpdateFlags = true;
                 }
                 if (this.PlayerOwner.Position != msg.position || this.PlayerOwner.Rotation != msg.inputState.aimAngles)
