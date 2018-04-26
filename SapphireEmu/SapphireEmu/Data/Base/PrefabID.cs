@@ -25,5 +25,7 @@ namespace SapphireEmu.Data.Base
         StoneHatchet    = 632250250,  // Каменный топор
         PixAxe          = 859655528,  // Железная кирка
         SalvagedPixAxe  = 2979271826, // Ледоруб
+        RifleAk         = 1031225694,
+        BoltRifle       = 2208341389
     }
 }

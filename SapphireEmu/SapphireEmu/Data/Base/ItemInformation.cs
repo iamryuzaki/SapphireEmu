@@ -9,7 +9,9 @@ namespace SapphireEmu.Data.Base
         public static Dictionary<ItemID, ItemInformation> ListPrefabsFromItemIds = new Dictionary<ItemID, ItemInformation>
         {
             { ItemID.Rock, new ItemInformation { Damage = 5, CanHeldEntity = true, PrefabUID = PrefabID.Rock, ItemID = ItemID.Rock}},
-            { ItemID.Torch, new ItemInformation { Damage = 1, CanHeldEntity = true, PrefabUID = PrefabID.Torch, ItemID = ItemID.Torch}}
+            { ItemID.Torch, new ItemInformation { Damage = 1, CanHeldEntity = true, PrefabUID = PrefabID.Torch, ItemID = ItemID.Torch}},
+            { ItemID.RifleAk, new ItemInformation() {Damage = 40, CanHeldEntity = true, PrefabUID = PrefabID.RifleAk, ItemID = ItemID.RifleAk}},
+            { ItemID.BoltRifle, new ItemInformation() {Damage = 100, CanHeldEntity = true, PrefabUID = PrefabID.BoltRifle, ItemID = ItemID.BoltRifle}},
         };
 
         public ItemID ItemID { get; private set; }
