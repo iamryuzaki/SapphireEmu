@@ -42,7 +42,6 @@ namespace SapphireEmu.Environment
         #region [SapphireEngine Hook] [Example] OnUpdate
         public override void OnUpdate()
         {
-            EACManager.DoUpdate();
             BaseNetworkServer.Cycle();
         }
         #endregion
@@ -60,7 +59,6 @@ namespace SapphireEmu.Environment
         #region [Method] [Example] OnDisconnected
         private void OnDisconnected(string _reasone, Connection _connection)
         {
-            EACManager.OnLeaveGame(_connection);
             BasePlayer player = Extended.Rust.ToPlayer(_connection);
             if (player != null)
                 player.Network.OnDisconnected();
@@ -91,11 +89,6 @@ namespace SapphireEmu.Environment
                 #region [Section] [Case] Message.Type.Tick
                 case Message.Type.Tick:
                     this.OnPlayerTick(_message);
-                    break;
-                #endregion
-                #region [Section] [Case] Message.Type.EAC
-                case Message.Type.EAC:
-                    EACManager.OnMessageReceived(_message);
                     break;
                 #endregion
             }

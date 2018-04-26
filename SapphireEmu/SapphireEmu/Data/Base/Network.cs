@@ -88,7 +88,7 @@ namespace SapphireEmu.Data.Base
                 } else
                     ConsoleSystem.LogWarning("[Data.Base.Network Run] Dont have networkable uid: " + uid);
             } else 
-                ConsoleSystem.LogWarning("[Data.Base.Network Run] Dont have released method: " + method);
+                ConsoleSystem.LogWarning("[Data.Base.Network Run] Dont have released method: " + method + " from " + BaseNetworkable.ListNetworkables?[uid]);
         }
     }
 }

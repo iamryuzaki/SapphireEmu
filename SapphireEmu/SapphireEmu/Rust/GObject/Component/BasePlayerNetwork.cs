@@ -1,6 +1,7 @@
 ﻿using Network;
 using SapphireEmu.Data.Base;
 using SapphireEmu.Data.Base.GObject;
+using SapphireEngine;
 using Message = Network.Message;
 
 namespace SapphireEmu.Rust.GObject.Component
@@ -49,8 +50,8 @@ namespace SapphireEmu.Rust.GObject.Component
         #region [Method] OnPlayerCreated
         public void OnPlayerCreated()
         {
-            this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem((int)ItemID.Rock, 1));
-            this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem((int)ItemID.Torch, 1));
+            this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.Rock));
+            this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.Torch));
             
             if (this.PlayerOwner.IsConnected)
             {
@@ -99,6 +100,17 @@ namespace SapphireEmu.Rust.GObject.Component
             }
             else
             {
+                if (this.PlayerOwner.ActiveItem?.UID != msg.activeItem)
+                {
+                    if (msg.activeItem != 0)
+                    {
+                        if (Item.ListItemsInWorld.TryGetValue(msg.activeItem, out Item item))
+                            this.PlayerOwner.ActiveItem = item;
+                    }
+                    else
+                        this.PlayerOwner.ActiveItem = null;
+                    needUpdateFlags = true;
+                }
                 if (this.PlayerOwner.Position != msg.position || this.PlayerOwner.Rotation != msg.inputState.aimAngles)
                 {
                     this.PlayerOwner.Position = msg.position;

@@ -44,13 +44,13 @@
     <Compile Include="Data\Base\GObject\E_PlayerFlags.cs" />
     <Compile Include="Data\Base\GObject\E_PlayerModelState.cs" />
     <Compile Include="Data\Base\ItemID.cs" />
+    <Compile Include="Data\Base\ItemInformation.cs" />
     <Compile Include="Data\Base\Message.cs" />
     <Compile Include="Data\Base\Network.cs" />
     <Compile Include="Data\Base\PrefabID.cs" />
     <Compile Include="Data\BuildingInformation.cs" />
     <Compile Include="Data\Settings.cs" />
     <Compile Include="Environment\ApplicationManager.cs" />
-    <Compile Include="Environment\EACManager.cs" />
     <Compile Include="Environment\NetworkManager.cs" />
     <Compile Include="Environment\SteamworksManager.cs" />
     <Compile Include="Extended\Network.cs" />
@@ -59,6 +59,7 @@
     <Compile Include="Extended\String.cs" />
     <Compile Include="Rust\GObject\BaseCombatEntity.cs" />
     <Compile Include="Rust\GObject\BaseEntity.cs" />
+    <Compile Include="Rust\GObject\BaseHeldEntity.cs" />
     <Compile Include="Rust\GObject\BaseNetworkable.cs" />
     <Compile Include="Rust\GObject\BasePlayer.cs" />
     <Compile Include="Rust\GObject\Component\BasePlayerNetwork.cs" />
@@ -126,6 +127,7 @@
       <HintPath>..\DefaultData\Reference\CSharp\SapphireEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\DefaultData\Reference\CSharp\UnityEngine.dll</HintPath>
       <Private>False</Private>

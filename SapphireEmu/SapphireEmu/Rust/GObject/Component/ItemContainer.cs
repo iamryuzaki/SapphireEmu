@@ -7,19 +7,24 @@ namespace SapphireEmu.Rust.GObject.Component
 {
     public class ItemContainer
     {
+        public static Dictionary<UInt32, ItemContainer> ListContainers { get; } = new Dictionary<uint, ItemContainer>();
+
         public UInt32 UID = 0;
 
         public E_AllowedContentsType AllowedContents = 0;
         public E_ItemContainerType ItemContainerType = 0;
-        public BaseEntity EntityOwner = null;
-        
+        public BaseEntity EntityOwner { get; }
+
         public Int32 Capacity = 6;
-        public List<Item> ListItems = new List<Item>();
-        public Dictionary<int, Item> ListSlots = new Dictionary<int, Item>();
+        public List<Item> ListItems { get; } = new List<Item>();
+        public Dictionary<int, Item> ListSlots { get; } = new Dictionary<int, Item>();
+
+        private List<int> availableSlots = new List<int>();
 
         public ItemContainer(BaseEntity entityOwner, int capacity = 6)
         {
             this.UID = BaseNetworkable.TakeUID();
+            ListContainers[this.UID] = this;
             this.Capacity = capacity;
             this.EntityOwner = entityOwner;
         }
@@ -51,22 +56,24 @@ namespace SapphireEmu.Rust.GObject.Component
 
         public int GetFirstEmptySlot()
         {
-            for (int i = 0; i < this.Capacity; i++)
-                if (ListSlots.TryGetValue(i, out _) == false)
-                    return i;
+            if (this.HasEmtptySlot())
+                for (int i = 0; i < this.Capacity; i++)
+                    if (ListSlots.TryGetValue(i, out _) == false)
+                        return i;
             return -1;
         }
 
-        public bool AddItemToContainer(Item item)
+        public bool AddItemToContainer(Item item, int slot = -1)
         {
             if (this.HasEmtptySlot())
             {
-                int slot = this.GetFirstEmptySlot();
+                if (slot == -1 || this.ListSlots.TryGetValue(slot, out _))
+                    slot = this.GetFirstEmptySlot();
                 
                 this.ListItems.Add(item);
                 this.ListSlots[slot] = item;
                 item.Container = this;
-                item.Position = slot;
+                item.PositionInContainer = slot;
                 
                 return true;
             }
@@ -75,11 +82,11 @@ namespace SapphireEmu.Rust.GObject.Component
 
         public bool RemoveItemFromContainer(Item item)
         {
-            if (ListSlots.TryGetValue(item.Position, out Item targetItem) && targetItem == item)
+            if (ListSlots.TryGetValue(item.PositionInContainer, out Item targetItem) && targetItem == item)
             {
-                ListSlots.Remove(item.Position);
+                ListSlots.Remove(item.PositionInContainer);
                 ListItems.Remove(item);
-                item.Position = -1;
+                item.PositionInContainer = -1;
                 item.Container = null;
                 return true;
             }
@@ -97,7 +104,7 @@ namespace SapphireEmu.Rust.GObject.Component
             {
                 allowedContents = 1,
                 allowedItem = 0,
-                availableSlots = new List<int>(),
+                availableSlots = availableSlots,
                 contents = listItems,
                 flags = (int)this.ItemContainerType,
                 maxStackSize = 0,

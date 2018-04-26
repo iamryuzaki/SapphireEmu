@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Network;
 using SapphireEmu.Data;
 using SapphireEngine;
@@ -20,7 +21,7 @@ namespace SapphireEmu.Environment
             var init = new Facepunch.Steamworks.ServerInit(BuildingInformation.SteamworksModDir, BuildingInformation.SteamworksGameDesc)
             {
                 GamePort = (ushort)Settings.GamePort,
-                IpAddress = IPAddres.GetUintFromIP(Settings.ServerIP),
+                IpAddress = IPAddress.Parse(Settings.ServerIP),
                 Secure = Settings.Secure,
                 VersionString = Settings.GameVersion.ToString(),
             };

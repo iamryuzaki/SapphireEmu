@@ -21,7 +21,6 @@ namespace SapphireEmu.Environment
             ZonaManager.Initialization();
             this.AddType<NetworkManager>();
             this.AddType<SteamworksManager>();
-            EACManager.DoStartup();
         }
 
         public override void OnUpdate()
@@ -31,7 +30,7 @@ namespace SapphireEmu.Environment
 
         private void OnShutdown()
         {
-            EACManager.DoShutdown();
+            
         }
         
         private void Database_Initialization()

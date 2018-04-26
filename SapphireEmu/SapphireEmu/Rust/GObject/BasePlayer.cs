@@ -10,6 +10,7 @@ using SapphireEmu.Rust.GObject.Component;
 using SapphireEngine;
 using UnityEngine;
 using Item = ProtoBuf.Item;
+using ItemContainer = SapphireEmu.Rust.GObject.Component.ItemContainer;
 
 namespace SapphireEmu.Rust.GObject
 {
@@ -26,6 +27,7 @@ namespace SapphireEmu.Rust.GObject
 
         public BasePlayerInventory Inventory { get; private set; }
         public BasePlayerNetwork Network { get; private set; }
+        public Component.Item ActiveItem { get; set; } = null;
 
         public E_PlayerFlags PlayerFlags = E_PlayerFlags.Sleeping;
         public E_PlayerButton PlayerButtons = 0;
@@ -98,6 +100,7 @@ namespace SapphireEmu.Rust.GObject
                     skinCol = -1,
                     skinMesh = -1,
                     skinTex = -1,
+                    heldEntity = this.ActiveItem?.HeldEnityUID ?? 0
                 }
             };
         }
@@ -119,7 +122,8 @@ namespace SapphireEmu.Rust.GObject
                     userid = this.SteamID,
                     name = this.Username,
                     playerFlags = (int) this.PlayerFlags,
-                    modelState = new ModelState {flags = (int) this.PlayerModelState}
+                    modelState = new ModelState {flags = (int) this.PlayerModelState},
+                    heldEntity = this.ActiveItem?.HeldEnityUID ?? 0
                 }
             };
         }
@@ -192,7 +196,7 @@ namespace SapphireEmu.Rust.GObject
         #region [Method] Hurt
         public override void Hurt(float damage, E_DamageType type = E_DamageType.Generic, BaseCombatEntity initiator = null)
         {
-            if (damage > this.Health && this.HasPlayerFlag(E_PlayerFlags.Wounded) == false)
+            if (damage >= this.Health && this.HasPlayerFlag(E_PlayerFlags.Wounded) == false)
             {
                 this.Health = 5f;
                 this.SetPlayerFlag(E_PlayerFlags.Wounded, true);
@@ -200,11 +204,27 @@ namespace SapphireEmu.Rust.GObject
                 return;
             }
             base.Hurt(damage, type, initiator);
-            this.ClientRPCEx<Vector3, int>(new SendInfo(this.Network.NetConnection), null, Data.Base.Network.RPCMethod.ERPCMethodType.DirectionalDamage, this.Position, (int)type);
+            if (damage > 20)
+                this.ClientRPCEx<Vector3, int>(new SendInfo(this.Network.NetConnection), null, Data.Base.Network.RPCMethod.ERPCMethodType.DirectionalDamage, this.Position, (int)type);
         }
         #endregion
 
         #region [Methods] OnRPC Methods
+
+        [Data.Base.Network.RPCMethod(Data.Base.Network.RPCMethod.ERPCMethodType.MoveItem)]
+        void OnRPC_MoveItem(Message packet)
+        {
+            uint itemid = packet.read.UInt32();
+            if (Component.Item.ListItemsInWorld.TryGetValue(itemid, out Component.Item itemTarget))
+            {
+                uint newContainerUID = packet.read.UInt32();
+                if (ItemContainer.ListContainers.TryGetValue(newContainerUID, out ItemContainer containerTarget))
+                {
+                    int slot = packet.read.Int8();
+                    int amount = packet.read.UInt16();
+                }
+            }
+        }
         
         #region [Method] OnRPC_OnPlayerLanded
         [Data.Base.Network.RPCMethod(Data.Base.Network.RPCMethod.ERPCMethodType.OnPlayerLanded)]

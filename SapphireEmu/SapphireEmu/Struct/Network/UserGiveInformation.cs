@@ -5,7 +5,7 @@ using SapphireEngine;
 
 namespace SapphireEmu.Struct.Network
 {
-    public struct UserGiveInformation
+    public class UserGiveInformation
     {
         public Byte PacketProtocol;
         public UInt64 SteamID;
