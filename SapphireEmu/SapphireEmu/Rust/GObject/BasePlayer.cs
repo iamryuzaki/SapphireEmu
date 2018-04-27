@@ -205,7 +205,7 @@ namespace SapphireEmu.Rust.GObject
             {
                 this.Health = 5f;
                 this.SetPlayerFlag(E_PlayerFlags.Wounded, true);
-                this.SendNetworkUpdate();
+                this.SendNetworkUpdate_PlayerFlags();
                 return;
             }
             base.Hurt(damage, type, initiator);

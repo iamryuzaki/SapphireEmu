@@ -52,8 +52,6 @@ namespace SapphireEmu.Rust.GObject
         {
             base.SetFlag(E_EntityFlags.Reserved4, bHeld);
             base.SetFlag(E_EntityFlags.Disabled, !bHeld);
-            if (bHeld)
-            SendNetworkUpdate();
         }
 
 
@@ -61,7 +59,7 @@ namespace SapphireEmu.Rust.GObject
         public override void SendNetworkUpdate(Entity _entity = null)
         {
             if (this.PlayerOwner != null && this.PlayerOwner.IsConnected)
-                this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.Network.NetConnection));
+                this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.Network.NetConnection), _entity);
             
             if (this.ListViewToMe.Count != 0)
                 this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.ListViewToMe.ToConnectionsList()), _entity);
