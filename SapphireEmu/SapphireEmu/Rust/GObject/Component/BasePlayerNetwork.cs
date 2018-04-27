@@ -41,8 +41,8 @@ namespace SapphireEmu.Rust.GObject.Component
             else
             {
                 this.PlayerOwner.Spawn((uint) Data.Base.PrefabID.BasePlayer);
-                this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.Rock));
-                this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.Torch));
+                this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(ItemManager.CreateByPartialName("rock"));
+                this.PlayerOwner.Inventory.ContainerBelt.AddItemToContainer(ItemManager.CreateByPartialName("torch"));
                 this.PlayerOwner.Inventory.ContainerBelt.OnItemConainerUpdate();
             }
 

@@ -88,6 +88,7 @@ namespace SapphireEmu.Rust.GObject.Component
                 item.Container = this;
                 item.PositionInContainer = slot;
                 item.HeldEntity?.SetHeld(false);
+                item.HeldEntity?.SendNetworkUpdate();
 
                 return true;
             }

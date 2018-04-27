@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\Builded</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;SAPPHIRE_EMU</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -28,7 +28,7 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\Builded\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;SAPPHIRE_EMU</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -43,7 +43,6 @@
     <Compile Include="Data\Base\GObject\E_PlayerButton.cs" />
     <Compile Include="Data\Base\GObject\E_PlayerFlags.cs" />
     <Compile Include="Data\Base\GObject\E_PlayerModelState.cs" />
-    <Compile Include="Data\Base\ItemID.cs" />
     <Compile Include="Data\Base\Message.cs" />
     <Compile Include="Data\Base\Network.cs" />
     <Compile Include="Data\Base\PrefabID.cs" />
@@ -61,8 +60,10 @@
     <Compile Include="Rust\GObject\BaseCombatEntity.cs" />
     <Compile Include="Rust\GObject\BaseEntity.cs" />
     <Compile Include="Rust\GObject\BaseHeldEntity.cs" />
+    <Compile Include="Rust\GObject\BaseMelee.cs" />
     <Compile Include="Rust\GObject\BaseNetworkable.cs" />
     <Compile Include="Rust\GObject\BasePlayer.cs" />
+    <Compile Include="Rust\GObject\BaseProjectile.cs" />
     <Compile Include="Rust\GObject\Component\BasePlayerNetwork.cs" />
     <Compile Include="Rust\GObject\Component\Item.cs" />
     <Compile Include="Rust\GObject\Component\ItemContainer.cs" />

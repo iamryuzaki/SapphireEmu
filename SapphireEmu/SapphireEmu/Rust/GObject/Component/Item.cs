@@ -12,12 +12,13 @@ namespace SapphireEmu.Rust.GObject.Component
     {
         public static Dictionary<uint, Item> ListItemsInWorld = new Dictionary<uint, Item>();
         
-        public static Item CreateItem(ItemID item, uint amount = 1) => new Item(item, amount);
+        public static Item CreateItem(ItemInformation info, uint amount = 1, ulong skinid = 0) => new Item(info, amount, skinid);
 
         public uint UID { get; }
 
         public float Condition { get; private set; } = 50f;
         public uint Amount { get; private set; }
+        public ulong SkinID { get; private set; }
         public int PositionInContainer = -1;
         public uint HeldEnityUID => this.HeldEntity?.UID ?? 0;
 
@@ -28,41 +29,32 @@ namespace SapphireEmu.Rust.GObject.Component
 
         public E_ItemFlags ItemFlags = E_ItemFlags.None;
 
-        private Item(ItemID _item, uint _amount)
+        private Item(ItemInformation _info, uint _amount, ulong _skinid)
         {
-            if (ItemInformation.ListPrefabsFromItemIds.TryGetValue((ItemID) _item, out var itemInformation))
+            this.UID = BaseNetworkable.TakeUID();
+            ListItemsInWorld[this.UID] = this;
+
+            this.Information = _info;
+
+            this.SkinID = _skinid;
+            this.Condition = this.Information.MaxCondition;
+
+            if (_amount <= 0)
+                this.Amount = 1;
+            else if (_amount > this.Information.MaxStack)
+                this.Amount = (uint) this.Information.MaxStack;
+            else
+                this.Amount = _amount;
+
+            if (this.Information.IsHoldable())
             {
-                this.UID = BaseNetworkable.TakeUID();
-                ListItemsInWorld[this.UID] = this;
-                
-                this.Information = itemInformation;
-
-                this.Condition = this.Information.MaxCondition;
-                
-                if (_amount <= 0)
-                    this.Amount = 1;
-                else if (_amount > this.Information.MaxStack)
-                    this.Amount = (uint)this.Information.MaxStack;
-                else
-                    this.Amount = _amount;
-
-                if (this.Information.IsHoldable)
+                if (ItemInformation.GetHeldType(_info.HeldType, out Type type) == false)
                 {
-                    this.HeldEntity = Framework.Bootstraper.AddType<BaseHeldEntity>();
-                    this.HeldEntity.ItemOwner = this;
-                    this.HeldEntity.IsComponent = true;
-                    this.HeldEntity.Spawn(this.Information.HeldEntity.PrefabID);
+                    ConsoleSystem.LogError($"[{nameof(Item)}] Unrealized class for <{_info.Shortname}>");
                 }
-            }
-        }
-        
-        
-        public static Type GetHeldType(ItemInformation.ItemHeldType type)
-        {
-            switch (type)
-            {
-                case ItemInformation.ItemHeldType.HeldEntity: return typeof(HeldEntity);
-                default: return null;
+                this.HeldEntity = (BaseHeldEntity)Framework.Bootstraper.AddType(type);
+                this.HeldEntity.ItemOwner = this;
+                this.HeldEntity.Spawn(this.Information.HeldEntity.PrefabID);
             }
         }
 
@@ -78,7 +70,8 @@ namespace SapphireEmu.Rust.GObject.Component
                 slot = this.PositionInContainer,
                 contents = null,
                 flags = (int)ItemFlags,
-                heldEntity = HeldEnityUID
+                heldEntity = HeldEnityUID,
+                skinid = this.SkinID 
             };         
             return item;
         }

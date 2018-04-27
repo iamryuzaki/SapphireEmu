@@ -155,10 +155,10 @@ namespace SapphireEmu.Environment
                 {
                     player = this.AddType<BasePlayer>();
                     player.SteamID = _message.connection.userid;
-                    player.Position = new Vector3(0,10,0);
+                    player.Position = new Vector3(0,2,0);
                     BasePlayer.ListPlayers.Add(player.SteamID, player);
                 }
-                player.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.RifleAk));
+                player.Inventory.ContainerBelt.AddItemToContainer(ItemManager.CreateByPartialName("rifle.ak"));
 //                player.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.BoltRifle));
                 player.Network.OnConnected(_message.connection);
 //                BasePlayer player2 = Framework.Bootstraper.AddType<BasePlayer>();

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Mono.Cecil;
 using SapphireEmu.Data;
+using SapphireEmu.Data.Base;
 using SapphireEmu.Rust.ZonaManager;
 using SapphireEngine;
 using SapphireEngine.Functions;
@@ -19,6 +20,7 @@ namespace SapphireEmu.Environment
             ConsoleSystem.OutputPath = BuildingInformation.DirectoryLogs + "/output.log";
             this.Database_Initialization();
             ZonaManager.Initialization();
+            ItemManager.Initialization();
             this.AddType<NetworkManager>();
             this.AddType<SteamworksManager>();
         }
