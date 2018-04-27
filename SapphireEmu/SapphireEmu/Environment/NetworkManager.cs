@@ -159,11 +159,11 @@ namespace SapphireEmu.Environment
                     BasePlayer.ListPlayers.Add(player.SteamID, player);
                 }
                 player.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.RifleAk));
-                player.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.BoltRifle));
+//                player.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.BoltRifle));
                 player.Network.OnConnected(_message.connection);
-                BasePlayer player2 = Framework.Bootstraper.AddType<BasePlayer>();
-                player2.Position =  new Vector3(0,10,0);
-                player2.Spawn((uint)PrefabID.BasePlayer);
+//                BasePlayer player2 = Framework.Bootstraper.AddType<BasePlayer>();
+//                player2.Position =  new Vector3(0,10,0);
+//                player2.Spawn((uint)PrefabID.BasePlayer);
             }
         }
         #endregion

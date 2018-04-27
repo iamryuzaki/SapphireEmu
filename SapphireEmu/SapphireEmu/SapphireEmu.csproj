@@ -44,11 +44,12 @@
     <Compile Include="Data\Base\GObject\E_PlayerFlags.cs" />
     <Compile Include="Data\Base\GObject\E_PlayerModelState.cs" />
     <Compile Include="Data\Base\ItemID.cs" />
-    <Compile Include="Data\Base\ItemInformation.cs" />
     <Compile Include="Data\Base\Message.cs" />
     <Compile Include="Data\Base\Network.cs" />
     <Compile Include="Data\Base\PrefabID.cs" />
     <Compile Include="Data\BuildingInformation.cs" />
+    <Compile Include="Data\Items\ItemInformation.cs" />
+    <Compile Include="Data\Items\ItemManager.cs" />
     <Compile Include="Data\Settings.cs" />
     <Compile Include="Environment\ApplicationManager.cs" />
     <Compile Include="Environment\NetworkManager.cs" />
@@ -114,6 +115,9 @@
     <Reference Include="Mono.Cecil.Rocks, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
       <HintPath>..\DefaultData\Reference\CSharp\Mono.Cecil.Rocks.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DefaultData\Reference\CSharp\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Data, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\DefaultData\Reference\CSharp\Rust.Data.dll</HintPath>

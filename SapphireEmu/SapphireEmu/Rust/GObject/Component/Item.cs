@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using ProtoBuf;
 using SapphireEmu.Data.Base;
 using SapphireEmu.Data.Base.GObject.Component;
 using SapphireEmu.Environment;
@@ -40,17 +42,27 @@ namespace SapphireEmu.Rust.GObject.Component
                 if (_amount <= 0)
                     this.Amount = 1;
                 else if (_amount > this.Information.MaxStack)
-                    this.Amount = this.Information.MaxStack;
+                    this.Amount = (uint)this.Information.MaxStack;
                 else
                     this.Amount = _amount;
 
-                if (this.Information.CanHeldEntity)
+                if (this.Information.IsHoldable)
                 {
                     this.HeldEntity = Framework.Bootstraper.AddType<BaseHeldEntity>();
                     this.HeldEntity.ItemOwner = this;
                     this.HeldEntity.IsComponent = true;
-                    this.HeldEntity.Spawn((uint)this.Information.PrefabUID);
+                    this.HeldEntity.Spawn(this.Information.HeldEntity.PrefabID);
                 }
+            }
+        }
+        
+        
+        public static Type GetHeldType(ItemInformation.ItemHeldType type)
+        {
+            switch (type)
+            {
+                case ItemInformation.ItemHeldType.HeldEntity: return typeof(HeldEntity);
+                default: return null;
             }
         }
 
