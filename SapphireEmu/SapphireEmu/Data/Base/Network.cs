@@ -47,7 +47,13 @@ namespace SapphireEmu.Data.Base
                 Assist = 540658179, // само поднятия
                 StartReload = 3302290555, //начало перезарядки
                 Reload = 3360326041, //конец перезарядки
+                OnDied = 3282506307,
+                ClientKeepConnectionAlive = 2177997023,
+                SignalFromServerEx = 3008034696,
+                SignalFromServer = 4248935445,
+                ClientLoadingComplete = 618836810,
                 DirectionalDamage = 4047348697,
+                CL_Punch = 632479192,
             }
             #endregion
         }

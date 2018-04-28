@@ -58,7 +58,9 @@
     <Compile Include="Extended\Rust.cs" />
     <Compile Include="Extended\String.cs" />
     <Compile Include="Rust\GObject\BaseCombatEntity.cs" />
-    <Compile Include="Rust\GObject\BaseEntity.cs" />
+    <Compile Include="Rust\GObject\BaseEntity\BaseEntity.cs" />
+    <Compile Include="Rust\GObject\BaseEntity\Enum\Signal.cs" />
+    <Compile Include="Rust\GObject\BaseEntity\Signals.cs" />
     <Compile Include="Rust\GObject\BaseHeldEntity.cs" />
     <Compile Include="Rust\GObject\BaseMelee.cs" />
     <Compile Include="Rust\GObject\BaseNetworkable.cs" />
