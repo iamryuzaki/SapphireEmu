@@ -1,5 +1,8 @@
-﻿namespace SapphireEmu.Data.Base.GObject
+﻿using System;
+
+namespace SapphireEmu.Data.Base.GObject
 {
+    [Flags]
     public enum E_EntityFlags
     {
         Broken = 0x1000,
