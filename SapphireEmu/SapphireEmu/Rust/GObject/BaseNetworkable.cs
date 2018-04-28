@@ -32,7 +32,23 @@ namespace SapphireEmu.Rust.GObject
 
         // Which player is subscribed to me and view me
         public List<BasePlayer> ListViewToMe = new List<BasePlayer>();
+        
+        #region [Methods] Find Entities
+        public static bool FindNetworkable(UInt32 uid, out BaseNetworkable entity)
+        {
+            return ListNetworkables.TryGetValue(uid, out entity);
+        }
 
+        public static bool Find<T>(UInt32 uid, out T entity)
+            where T : BaseNetworkable
+        {
+            entity = null;
+            return FindNetworkable(uid, out BaseNetworkable networkable) && 
+                   (entity = (networkable as T)) != null;
+
+        }
+        #endregion
+        
         #region [Method] Spawn
         public void Spawn(uint _prefabID)
         {

@@ -22,7 +22,9 @@ namespace SapphireEmu.Rust
             
             ConsoleSystem.Log($"[{nameof(ItemManager)}] Loaded <{itemlist.Count}> items!");
         }
-        
+
+        public static ItemInformation FindInformation(ItemID itemid) => FindInformation((int) itemid);
+
         public static ItemInformation FindInformation(int itemid)
         {
             if (itemDictionary.TryGetValue(itemid, out ItemInformation info) == false)

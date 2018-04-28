@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SapphireEmu.Rust.GObject
 {
-    public class BasePlayer : BaseCombatEntity
+    public partial class BasePlayer : BaseCombatEntity
     {
         public static Dictionary<UInt64, BasePlayer> ListPlayers = new Dictionary<ulong, BasePlayer>();
         public static List<BasePlayer> ListOnlinePlayers = new List<BasePlayer>();
@@ -293,6 +293,8 @@ namespace SapphireEmu.Rust.GObject
             }
         }
         #endregion   
+        
+        
         
         #endregion
 

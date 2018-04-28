@@ -61,6 +61,7 @@
     <Compile Include="Rust\GObject\BaseHeldEntity.cs" />
     <Compile Include="Rust\GObject\BaseMelee.cs" />
     <Compile Include="Rust\GObject\BaseNetworkable.cs" />
+    <Compile Include="Rust\GObject\BasePlayer\Attack.cs" />
     <Compile Include="Rust\GObject\BasePlayer\BasePlayer.cs" />
     <Compile Include="Rust\GObject\BasePlayer\Components\BasePlayerInventory.cs" />
     <Compile Include="Rust\GObject\BasePlayer\Components\BasePlayerNetwork.cs" />

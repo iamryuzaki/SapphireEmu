@@ -1,4 +1,6 @@
-﻿using ProtoBuf;
+﻿using Network;
+using ProtoBuf;
+using SapphireEmu.Environment;
 using UnityEngine;
 
 namespace SapphireEmu.Rust.GObject
@@ -8,6 +10,21 @@ namespace SapphireEmu.Rust.GObject
         public int AmmoCount = 10;
         public int AmmoMax = 30;
         public int AmmoType = 815896488;
+
+
+        #region OnRPC_CLProject
+        [RPCMethod(ERPCMethodType.CLProject)]
+        void OnRPC_ClProject(Message packet)
+        {
+            using (ProjectileShoot projectileShoot = ProjectileShoot.Deserialize(packet.read))
+            {
+                foreach (var projectile in projectileShoot.projectiles)
+                {
+                    PlayerOwner.firedProjectiles.Add(projectile.projectileID, ItemOwner.Information);
+                }
+            }
+        }
+        #endregion
         
         public override Entity GetEntityProtobuf()
         {

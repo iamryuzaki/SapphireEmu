@@ -158,9 +158,10 @@ namespace SapphireEmu.Environment
                 player.Inventory.ContainerBelt.AddItemToContainer(ItemManager.CreateByPartialName("rifle.ak"));
 //                player.Inventory.ContainerBelt.AddItemToContainer(Item.CreateItem(ItemID.BoltRifle));
                 player.Network.OnConnected(_message.connection);
-//                BasePlayer player2 = Framework.Bootstraper.AddType<BasePlayer>();
-//                player2.Position =  new Vector3(0,10,0);
-//                player2.Spawn((uint)PrefabID.BasePlayer);
+                BasePlayer player2 = Framework.Bootstraper.AddType<BasePlayer>();
+                player2.SetPlayerFlag(E_PlayerFlags.Sleeping, false);
+                player2.Position =  new Vector3(0,10,0);
+                player2.Spawn((uint)PrefabID.BasePlayer);
             }
         }
         #endregion

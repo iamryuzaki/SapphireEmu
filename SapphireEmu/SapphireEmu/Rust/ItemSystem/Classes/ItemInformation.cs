@@ -22,7 +22,8 @@ namespace SapphireEmu.Rust
         public ItemHeldType HeldType = ItemHeldType.None;
         public ItemHeldEntity HeldEntity = null;
         public ItemBaseProjectileInfo BaseProjectile = null;
-
+        public ItemBaseMelee BaseMelee = null; 
+        
         public bool IsHoldable() => HeldEntity != null;
 #if RUST
         public static ItemInformation Load(Item item)
@@ -46,6 +47,7 @@ namespace SapphireEmu.Rust
 
                 iteminfo.HeldEntity = ItemHeldEntity.Load(heldent);
                 iteminfo.BaseProjectile = ItemBaseProjectileInfo.Load(heldent);
+                iteminfo.BaseMelee = ItemBaseMelee.Load(heldent);
             }
 
             return iteminfo;
@@ -113,5 +115,24 @@ namespace SapphireEmu.Rust
             ROCKET = 32,
             NAILS = 64
         }
+    }
+    
+    public class ItemBaseMelee
+    {
+        public Single Damage;
+        public Single Radius;
+#if RUST
+        public static ItemBaseMelee Load(BaseEntity heldent)
+        {
+            var bMelee = heldent as BaseMelee;
+            if (bMelee == null) return null;
+
+            var ibmInfo = new ItemBaseMelee();
+            ibmInfo.Damage = bMelee.damageTypes.Sum(p => p.amount);
+            ibmInfo.Radius = bMelee.attackRadius;
+            return ibmInfo;
+            
+        }
+#endif
     }
 }
