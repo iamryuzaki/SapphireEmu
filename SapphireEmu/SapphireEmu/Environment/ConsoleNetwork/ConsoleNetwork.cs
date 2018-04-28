@@ -7,11 +7,12 @@ using SapphireEngine;
 
 namespace SapphireEmu.Environment
 {
-    public class ConsoleCommand : Attribute
+    public class ConsoleCommandAttribute : Attribute
     {
         public string Command { get; private set; }
+        public bool IsAdmin { get; set; }
 
-        public ConsoleCommand(string command)
+        public ConsoleCommandAttribute(string command)
         {
             this.Command = command;
         }
@@ -19,7 +20,18 @@ namespace SapphireEmu.Environment
     
     public partial class ConsoleNetwork
     {
-        private static Dictionary<string, Reflection.FastMethodInfo> ListCommandMethods = new Dictionary<string, Reflection.FastMethodInfo>();
+        private static Dictionary<string, CommandMethod> ListCommandMethods = new Dictionary<string, CommandMethod>();
+        public class CommandMethod
+        {
+            public Reflection.FastMethodInfo Call;
+            public ConsoleCommandAttribute Attribute;
+
+            public CommandMethod(Reflection.FastMethodInfo method, ConsoleCommandAttribute attribute)
+            {
+                this.Call = method;
+                this.Attribute = attribute;
+            }
+        }
         
         public static void Load()
         {
@@ -29,11 +41,13 @@ namespace SapphireEmu.Environment
                 MethodInfo[] methods = types[i].GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
                 for (var j = 0; j < methods.Length; j++)
                 {
-                    object[] args = methods[j].GetCustomAttributes(typeof(ConsoleCommand), true);
+                    object[] args = methods[j].GetCustomAttributes(typeof(ConsoleCommandAttribute), true);
                     if (args.Length != 0)
                     {
-                        ConsoleCommand commandMethod = args[0] as ConsoleCommand;
-                        ListCommandMethods[commandMethod.Command] = new Reflection.FastMethodInfo(methods[j]);
+                        ConsoleCommandAttribute attribute = args[0] as ConsoleCommandAttribute;
+                        var method = new Reflection.FastMethodInfo(methods[j]);
+                        
+                        ListCommandMethods[attribute.Command] = new CommandMethod(method, attribute);
                     }
                 }
             }
@@ -47,24 +61,53 @@ namespace SapphireEmu.Environment
                 ConsoleSystem.LogWarning(string.Concat("Client without connection tried to run command: ", command));
                 return;
             }
-            Arg arg = new Arg(command, packet.connection);
+            Arg arg = Arg.FromClient(command, packet.connection);
             if (arg.Invalid)
             {
                 ConsoleSystem.LogWarning($"Invalid console command from [{packet.ToPlayer().SteamID}/{packet.ToPlayer().Username}]: {command}");
                 return;
             }
 
-            if (ListCommandMethods.TryGetValue(arg.Command, out Reflection.FastMethodInfo method) == false)
+            if (ListCommandMethods.TryGetValue(arg.Command, out CommandMethod cmdMethod) == false)
             {
                 ConsoleSystem.LogWarning($"Unknown console command from [{packet.ToPlayer().SteamID}/{packet.ToPlayer().Username}]: {arg.Command}");
                 return;
             }
 
-            method.Invoke(null, arg);
+            if (cmdMethod.Attribute.IsAdmin && arg.IsAdmin == false)
+            {
+                SendClientReply(packet.connection, "You don't have permission to run this command");
+                return;
+            }
+
+            cmdMethod.Call.Invoke(null, arg);
 
             if (string.IsNullOrEmpty(arg.Reply) == false)
             {
                 SendClientReply(packet.connection, arg.Reply);
+            }
+        }
+        
+        internal static void OnServerCommand(string command)
+        {
+            Arg arg = Arg.FromServer(command);
+            if (arg.Invalid)
+            {
+                ConsoleSystem.LogWarning($"Invalid console command: {command}");
+                return;
+            }
+
+            if (ListCommandMethods.TryGetValue(arg.Command, out CommandMethod cmdMethod) == false)
+            {
+                ConsoleSystem.LogWarning($"Unknown console command: {arg.Command}");
+                return;
+            }
+
+            cmdMethod.Call.Invoke(null, arg);
+
+            if (string.IsNullOrEmpty(arg.Reply) == false)
+            {
+                ConsoleSystem.Log(arg.Reply);
             }
         }
         

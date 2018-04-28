@@ -72,6 +72,7 @@
     <Compile Include="Rust\ItemSystem\Enum\E_AllowedContentsType.cs" />
     <Compile Include="Rust\ItemSystem\Enum\E_ItemContainerType.cs" />
     <Compile Include="Rust\ItemSystem\Enum\E_ItemFlags.cs" />
+    <Compile Include="Rust\ItemSystem\Enum\ItemID.cs" />
     <Compile Include="Rust\ItemSystem\Item.cs" />
     <Compile Include="Rust\ItemSystem\ItemContainer.cs" />
     <Compile Include="Rust\ItemSystem\ItemManager.cs" />
@@ -149,6 +150,9 @@
       <HintPath>..\DefaultData\Reference\CSharp\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Environment\ConsoleNetwork\Enum" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

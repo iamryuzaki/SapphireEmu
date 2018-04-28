@@ -22,7 +22,7 @@ namespace SapphireEmu.Rust
             
             ConsoleSystem.Log($"[{nameof(ItemManager)}] Loaded <{itemlist.Count}> items!");
         }
-
+        
         public static ItemInformation FindInformation(int itemid)
         {
             if (itemDictionary.TryGetValue(itemid, out ItemInformation info) == false)
@@ -33,9 +33,20 @@ namespace SapphireEmu.Rust
         }
 
 
-        public static Item CreateItem(int itemid, uint amount = 1, ulong skinid = 0)
+        public static Item CreateByItemID(int itemid, uint amount = 1, ulong skinid = 0)
         {
             ItemInformation info = FindInformation(itemid);
+            if (info == null)
+            {
+                return null;
+            }
+            
+            return Item.CreateItem(info, amount, skinid);
+        }
+        
+        public static Item CreateByItemID(ItemID itemid, uint amount = 1, ulong skinid = 0)
+        {
+            ItemInformation info = FindInformation((int)itemid);
             if (info == null)
             {
                 return null;

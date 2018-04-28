@@ -13,6 +13,7 @@ namespace SapphireEmu.Environment
         public override void OnAwake()
         {
             ConsoleSystem.OutputPath = BuildingInformation.DirectoryLogs + "/output.log";
+            ConsoleSystem.OnConsoleInput += ConsoleNetwork.OnServerCommand;
             this.Database_Initialization();
             ZonaManager.Initialization();
             ItemManager.Initialization();
