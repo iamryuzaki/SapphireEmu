@@ -37,8 +37,9 @@ namespace SapphireEmu.Environment
         
         private void Database_Initialization()
         {
-            Data.Base.Message.Load();
+            Data.Base.DefaultMessages.Load();
             Data.Base.Network.Load();
+            Data.Base.ConsoleNetwork.Load();
         }
         
     }

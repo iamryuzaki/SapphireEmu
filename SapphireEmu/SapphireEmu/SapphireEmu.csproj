@@ -34,6 +34,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Bootstrap.cs" />
+    <Compile Include="Data\Base\ConsoleNetwork\Arg.cs" />
+    <Compile Include="Data\Base\ConsoleNetwork\ConsoleNetwork.cs" />
     <Compile Include="Data\Base\GObject\Component\E_AllowedContentsType.cs" />
     <Compile Include="Data\Base\GObject\Component\E_ItemContainerType.cs" />
     <Compile Include="Data\Base\GObject\Component\E_ItemFlags.cs" />
@@ -43,7 +45,7 @@
     <Compile Include="Data\Base\GObject\E_PlayerButton.cs" />
     <Compile Include="Data\Base\GObject\E_PlayerFlags.cs" />
     <Compile Include="Data\Base\GObject\E_PlayerModelState.cs" />
-    <Compile Include="Data\Base\Message.cs" />
+    <Compile Include="Data\Base\DefaultMessages.cs" />
     <Compile Include="Data\Base\Network.cs" />
     <Compile Include="Data\Base\PrefabID.cs" />
     <Compile Include="Data\BuildingInformation.cs" />
@@ -57,6 +59,7 @@
     <Compile Include="Extended\Reflection.cs" />
     <Compile Include="Extended\Rust.cs" />
     <Compile Include="Extended\String.cs" />
+    <Compile Include="Rust\Commands\Inventory.cs" />
     <Compile Include="Rust\GObject\BaseCombatEntity.cs" />
     <Compile Include="Rust\GObject\BaseEntity\BaseEntity.cs" />
     <Compile Include="Rust\GObject\BaseEntity\Enum\Signal.cs" />

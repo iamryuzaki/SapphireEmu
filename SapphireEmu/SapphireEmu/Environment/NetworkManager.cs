@@ -63,7 +63,7 @@ namespace SapphireEmu.Environment
             BasePlayer player = Extended.Rust.ToPlayer(_connection);
             if (player != null)
                 player.Network.OnDisconnected();
-            ConsoleSystem.Log(string.Format(Data.Base.Message.Network_Connection_NewDisconnected, _connection.userid, _connection.username, _reasone));
+            ConsoleSystem.Log(string.Format(Data.Base.DefaultMessages.Network_Connection_NewDisconnected, _connection.userid, _connection.username, _reasone));
         }
         #endregion
 
@@ -90,6 +90,11 @@ namespace SapphireEmu.Environment
                 #region [Section] [Case] Message.Type.Tick
                 case Message.Type.Tick:
                     this.OnPlayerTick(_message);
+                    break;
+                #endregion
+                #region [Section] [Case] Message.Type.ConsoleCommand
+                case Message.Type.ConsoleCommand:
+                    ConsoleNetwork.OnClientCommand(_message);
                     break;
                 #endregion
             }
@@ -189,11 +194,11 @@ namespace SapphireEmu.Environment
 //                BaseNetworkServer.Kick(_message.connection, Data.Base.Message.Network_Connection_BadVersion_Client);
 //                return;
 //            }
-            ConsoleSystem.Log(String.Format(Data.Base.Message.Network_Connection_NewConnection, _message.connection.userid, _message.connection.username));
+            ConsoleSystem.Log(String.Format(Data.Base.DefaultMessages.Network_Connection_NewConnection, _message.connection.userid, _message.connection.username));
             SteamworksManager.Instance.OnUserAuth(_message.connection);
         }
         #endregion
-
+        
         #region [Method] OnUserAuthSuccess
         public void OnUserAuthSuccess(Connection _connection)
         {
@@ -217,7 +222,7 @@ namespace SapphireEmu.Environment
                 _connection.encryptOutgoing = true;
             }
             _connection.connected = true;
-            ConsoleSystem.Log(String.Format(Data.Base.Message.Network_Connection_NewConnection_Authed, _connection.userid, _connection.username));
+            ConsoleSystem.Log(String.Format(Data.Base.DefaultMessages.Network_Connection_NewConnection_Authed, _connection.userid, _connection.username));
         }
         #endregion
     }

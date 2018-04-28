@@ -8,9 +8,9 @@ using SapphireEngine;
 
 namespace SapphireEmu.Data.Base
 {
-    public class Message
+    public class DefaultMessages
     {
-        public static readonly string PathFileBase = BuildingInformation.DirectoryBase + nameof(Message) + ".dat";
+        public static readonly string PathFileBase = BuildingInformation.DirectoryBase + "Message.dat";
 
         public static string Network_Connection_BadVersion_Client { get; private set; }
         public static string Network_Connection_BadVersion_Server { get; private set; }
@@ -45,7 +45,7 @@ namespace SapphireEmu.Data.Base
                         }
                     }
                 }
-                var props = typeof(Message).GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+                var props = typeof(DefaultMessages).GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
                 for (int i = 0; i < props.Length; ++i)
                 {
                     var prop_name = props[i].Name.ToLower();
