@@ -124,6 +124,7 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\DefaultData\Reference\CSharp\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Rust.Data, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\DefaultData\Reference\CSharp\Rust.Data.dll</HintPath>
