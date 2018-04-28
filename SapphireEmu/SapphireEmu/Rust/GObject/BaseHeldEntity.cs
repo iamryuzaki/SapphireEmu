@@ -1,17 +1,12 @@
-﻿using System;
-using System.Linq;
-using Network;
-using ProtoBuf;
-using SapphireEmu.Data.Base;
+﻿using Network;
 using SapphireEmu.Data.Base.GObject;
 using SapphireEmu.Extended;
-using SapphireEngine;
 
 namespace SapphireEmu.Rust.GObject
 {
     public class BaseHeldEntity : BaseEntity
     {
-        public SapphireEmu.Rust.GObject.Component.Item ItemOwner { get; set; }
+        public Item ItemOwner { get; set; }
         public BasePlayer PlayerOwner => (BasePlayer)this.ItemOwner.Container?.EntityOwner;
 
         public override void OnAwake()
@@ -19,9 +14,9 @@ namespace SapphireEmu.Rust.GObject
             base.IsComponent = true;
         }
         
-        public override Entity GetEntityProtobuf()
+        public override ProtoBuf.Entity GetEntityProtobuf()
         {
-            return new Entity
+            return new ProtoBuf.Entity
             {
                 baseNetworkable = new ProtoBuf.BaseNetworkable
                 {
@@ -35,11 +30,11 @@ namespace SapphireEmu.Rust.GObject
                     pos = this.PlayerOwner.Position,
                     rot = this.Rotation
                 },
-                heldEntity = new HeldEntity
+                heldEntity = new ProtoBuf.HeldEntity
                 {
                     itemUID = this.ItemOwner.UID
                 },
-                parent = new ParentInfo
+                parent = new ProtoBuf.ParentInfo
                 {
                     uid = this.PlayerOwner.UID,
                     bone = 3354652700
@@ -56,7 +51,7 @@ namespace SapphireEmu.Rust.GObject
 
 
 
-        public override void SendNetworkUpdate(Entity _entity = null)
+        public override void SendNetworkUpdate(ProtoBuf.Entity _entity = null)
         {
             if (this.PlayerOwner != null && this.PlayerOwner.IsConnected)
                 this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.Network.NetConnection), _entity);

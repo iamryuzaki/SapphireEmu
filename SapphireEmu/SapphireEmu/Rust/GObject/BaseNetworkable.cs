@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using Network;
 using ProtoBuf;
 using SapphireEmu.Environment;
 using SapphireEmu.Extended;
 using SapphireEmu.Rust.ZonaManager;
 using SapphireEngine;
-using SapphireEngine.Functions;
 using UnityEngine;
 
 namespace SapphireEmu.Rust.GObject
@@ -172,7 +170,7 @@ namespace SapphireEmu.Rust.GObject
         #endregion
         
         #region [Methods] ClientRPC
-        private bool ClientRPCStart(Connection sourceConnection, Data.Base.Network.RPCMethod.ERPCMethodType method)
+        private bool ClientRPCStart(Connection sourceConnection, ERPCMethodType method)
         {
             if (NetworkManager.BaseNetworkServer.write.Start())
             {
@@ -185,7 +183,7 @@ namespace SapphireEmu.Rust.GObject
             return false;
         }
         
-        public void ClientRPCEx(SendInfo sendInfo, Connection sourceConnection, Data.Base.Network.RPCMethod.ERPCMethodType method)
+        public void ClientRPCEx(SendInfo sendInfo, Connection sourceConnection, ERPCMethodType method)
         {
             if (NetworkManager.BaseNetworkServer.IsConnected() && this.ClientRPCStart(sourceConnection, method))
             {
@@ -193,7 +191,7 @@ namespace SapphireEmu.Rust.GObject
             }
         }
         
-        public void ClientRPCEx<T1>(SendInfo sendInfo, Connection sourceConnection, Data.Base.Network.RPCMethod.ERPCMethodType method, T1 arg1)
+        public void ClientRPCEx<T1>(SendInfo sendInfo, Connection sourceConnection, ERPCMethodType method, T1 arg1)
         {
             if (NetworkManager.BaseNetworkServer.IsConnected() && this.ClientRPCStart(sourceConnection, method))
             {
@@ -202,7 +200,7 @@ namespace SapphireEmu.Rust.GObject
             }
         }
         
-        public void ClientRPCEx<T1,T2>(SendInfo sendInfo, Connection sourceConnection, Data.Base.Network.RPCMethod.ERPCMethodType method, T1 arg1, T2 arg2)
+        public void ClientRPCEx<T1,T2>(SendInfo sendInfo, Connection sourceConnection, ERPCMethodType method, T1 arg1, T2 arg2)
         {
             if (NetworkManager.BaseNetworkServer.IsConnected() && this.ClientRPCStart(sourceConnection, method))
             {
@@ -212,7 +210,7 @@ namespace SapphireEmu.Rust.GObject
             }
         }
         
-        public void ClientRPCEx<T1,T2,T3>(SendInfo sendInfo, Connection sourceConnection, Data.Base.Network.RPCMethod.ERPCMethodType method, T1 arg1, T2 arg2, T3 arg3)
+        public void ClientRPCEx<T1,T2,T3>(SendInfo sendInfo, Connection sourceConnection, ERPCMethodType method, T1 arg1, T2 arg2, T3 arg3)
         {
             if (NetworkManager.BaseNetworkServer.IsConnected() && this.ClientRPCStart(sourceConnection, method))
             {
@@ -223,7 +221,7 @@ namespace SapphireEmu.Rust.GObject
             }
         }
         
-        public void ClientRPCEx<T1,T2,T3,T4>(SendInfo sendInfo, Connection sourceConnection, Data.Base.Network.RPCMethod.ERPCMethodType method, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        public void ClientRPCEx<T1,T2,T3,T4>(SendInfo sendInfo, Connection sourceConnection, ERPCMethodType method, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
             if (NetworkManager.BaseNetworkServer.IsConnected() && this.ClientRPCStart(sourceConnection, method))
             {

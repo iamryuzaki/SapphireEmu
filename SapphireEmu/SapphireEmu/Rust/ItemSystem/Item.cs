@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using ProtoBuf;
-using SapphireEmu.Data.Base;
-using SapphireEmu.Data.Base.GObject.Component;
-using SapphireEmu.Environment;
+using SapphireEmu.Rust.GObject;
 using SapphireEngine;
 
-namespace SapphireEmu.Rust.GObject.Component
+namespace SapphireEmu.Rust
 {
     public class Item
     {

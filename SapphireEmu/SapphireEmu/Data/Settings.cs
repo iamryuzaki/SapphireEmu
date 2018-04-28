@@ -1,6 +1,4 @@
-﻿using UnityEngine.UI;
-
-namespace SapphireEmu.Data
+﻿namespace SapphireEmu.Data
 {
     public class Settings
     {

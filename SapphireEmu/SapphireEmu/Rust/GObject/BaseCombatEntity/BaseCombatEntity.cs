@@ -1,5 +1,4 @@
 ﻿using System;
-using SapphireEmu.Data.Base.GObject;
 
 namespace SapphireEmu.Rust.GObject
 {

@@ -1,6 +1,4 @@
-﻿using Network;
-using SapphireEmu.Data.Base.GObject;
-using SapphireEmu.Extended;
+﻿using SapphireEmu.Data.Base.GObject;
 
 namespace SapphireEmu.Rust.GObject
 {
@@ -32,42 +30,5 @@ namespace SapphireEmu.Rust.GObject
         {
             return ((this.EntityFlags & f) == f);
         }
-
-        #region [Methods] OnRPC Methods
-        
-        #region [Method] OnRPC_BroadcastSignalFromClient
-
-        [Data.Base.Network.RPCMethod(Data.Base.Network.RPCMethod.ERPCMethodType.BroadcastSignalFromClient)]
-        void OnRPC_BroadcastSignalFromClient(Message packet)
-        {
-            Signal signal = (Signal)packet.read.Int32();
-            string arg = packet.read.String();
-            this.SignalBroadcast(signal, arg, packet.connection);
-        }
-        #endregion
-        
-        #endregion
-
-        #region [Methods] Send Signals
-        public void SignalBroadcast(Signal signal, string arg, Connection sourceConnection = null)
-        {
-            SendInfo sendInfo = new SendInfo(base.ListViewToMe.ToConnectionsList())
-            {
-                method = SendMethod.Unreliable,
-                priority = Priority.Immediate
-            };
-            this.ClientRPCEx<int, string>(sendInfo, sourceConnection, Data.Base.Network.RPCMethod.ERPCMethodType.SignalFromServerEx, (int)signal, arg);
-        }
-
-        public void SignalBroadcast(Signal signal, Connection sourceConnection = null)
-        {
-            SendInfo sendInfo = new SendInfo(base.ListViewToMe.ToConnectionsList())
-            {
-                method = SendMethod.Unreliable,
-                priority = Priority.Immediate
-            };
-            this.ClientRPCEx<int>(sendInfo, sourceConnection, Data.Base.Network.RPCMethod.ERPCMethodType.SignalFromServer, (int)signal);
-        }
-        #endregion
     }
 }

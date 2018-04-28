@@ -1,21 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Text;
-using Facepunch;
 using Network;
-using ProtoBuf;
 using SapphireEmu.Data;
 using SapphireEmu.Data.Base;
-using SapphireEmu.Data.Base.GObject;
+using SapphireEmu.Rust;
+using SapphireEmu.Rust.GObject;
 using SapphireEmu.Struct.Network;
 using SapphireEngine;
-using SapphireEngine.Functions;
 using UnityEngine;
-using BaseNetworkable = SapphireEmu.Rust.GObject.BaseNetworkable;
-using BasePlayer = SapphireEmu.Rust.GObject.BasePlayer;
-using Item = SapphireEmu.Rust.GObject.Component.Item;
-using Message = Network.Message;
-using Server = Facepunch.Network.Raknet.Server;
 
 namespace SapphireEmu.Environment
 {
@@ -30,7 +22,7 @@ namespace SapphireEmu.Environment
         public override void OnAwake()
         {
             Instance = this;
-            BaseNetworkServer  = new Server();
+            BaseNetworkServer  = new Facepunch.Network.Raknet.Server();
             BaseNetworkServer.port = Settings.GamePort;
             BaseNetworkServer.ip = Settings.ServerIP;
             BaseNetworkServer.onUnconnectedMessage = OnUnconnectedMessage;
@@ -142,7 +134,7 @@ namespace SapphireEmu.Environment
         {
             uint uid = _message.read.EntityID();
             uint methodUID = _message.read.UInt32();
-            Data.Base.Network.Run(uid, (Data.Base.Network.RPCMethod.ERPCMethodType)methodUID, _message);
+            RPCNetwork.Run(uid, (ERPCMethodType)methodUID, _message);
         }
         #endregion
 
@@ -150,9 +142,9 @@ namespace SapphireEmu.Environment
         private void OnClientReady(Message _message)
         {
             _message.connection.decryptIncoming = true;
-            using (ClientReady ready = ClientReady.Deserialize(_message.read))
+            using (ProtoBuf.ClientReady ready = ProtoBuf.ClientReady.Deserialize(_message.read))
             {
-                foreach (ClientReady.ClientInfo info in ready.clientInfo)
+                foreach (ProtoBuf.ClientReady.ClientInfo info in ready.clientInfo)
                     _message.connection.info.Set(info.name, info.value);
 
                 BasePlayer player = Extended.Rust.ToPlayer(_message);
@@ -202,7 +194,7 @@ namespace SapphireEmu.Environment
         #region [Method] OnUserAuthSuccess
         public void OnUserAuthSuccess(Connection _connection)
         {
-            using (Approval approval = new Approval())
+            using (ProtoBuf.Approval approval = new ProtoBuf.Approval())
             {
                 uint encryption = (uint) Settings.NetworkEncryptionLevel;
                 approval.level = Settings.MapName;
@@ -222,7 +214,7 @@ namespace SapphireEmu.Environment
                 _connection.encryptOutgoing = true;
             }
             _connection.connected = true;
-            ConsoleSystem.Log(String.Format(Data.Base.DefaultMessages.Network_Connection_NewConnection_Authed, _connection.userid, _connection.username));
+            ConsoleSystem.Log(String.Format(DefaultMessages.Network_Connection_NewConnection_Authed, _connection.userid, _connection.username));
         }
         #endregion
     }

@@ -1,10 +1,41 @@
 ﻿using Network;
+using SapphireEmu.Environment;
 using SapphireEmu.Extended;
 
 namespace SapphireEmu.Rust.GObject
 {
     public partial class BaseEntity
     {
+        #region [Method] OnRPC_BroadcastSignalFromClient
+        [RPCMethod(ERPCMethodType.BroadcastSignalFromClient)]
+        void OnRPC_BroadcastSignalFromClient(Message packet)
+        {
+            E_Signal eSignal = (E_Signal)packet.read.Int32();
+            string arg = packet.read.String();
+            this.SignalBroadcast(eSignal, arg, packet.connection);
+        }
+        #endregion
         
+        #region [Methods] Send Signals
+        public void SignalBroadcast(E_Signal eSignal, string arg, Connection sourceConnection = null)
+        {
+            SendInfo sendInfo = new SendInfo(base.ListViewToMe.ToConnectionsList())
+            {
+                method = SendMethod.Unreliable,
+                priority = Priority.Immediate
+            };
+            this.ClientRPCEx<int, string>(sendInfo, sourceConnection, ERPCMethodType.SignalFromServerEx, (int)eSignal, arg);
+        }
+
+        public void SignalBroadcast(E_Signal eSignal, Connection sourceConnection = null)
+        {
+            SendInfo sendInfo = new SendInfo(base.ListViewToMe.ToConnectionsList())
+            {
+                method = SendMethod.Unreliable,
+                priority = Priority.Immediate
+            };
+            this.ClientRPCEx<int>(sendInfo, sourceConnection, ERPCMethodType.SignalFromServer, (int)eSignal);
+        }
+        #endregion
     }
 }

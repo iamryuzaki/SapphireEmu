@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
-using SapphireEmu.Rust.GObject.Component;
+using SapphireEmu.Data;
 using SapphireEngine;
 
-namespace SapphireEmu.Data.Base
+namespace SapphireEmu.Rust
 {
     public static class ItemManager
     {

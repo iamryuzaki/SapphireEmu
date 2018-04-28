@@ -5,7 +5,6 @@ using SapphireEmu.Data;
 using SapphireEmu.Environment;
 using SapphireEmu.Extended;
 using SapphireEmu.Rust.GObject;
-using SapphireEngine;
 
 namespace SapphireEmu.Rust.ZonaManager
 {

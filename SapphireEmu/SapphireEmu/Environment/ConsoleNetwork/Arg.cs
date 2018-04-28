@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using SapphireEngine;
 using UnityEngine;
 
-namespace SapphireEmu.Data.Base
+namespace SapphireEmu.Environment
 {
     public partial class ConsoleNetwork
     {

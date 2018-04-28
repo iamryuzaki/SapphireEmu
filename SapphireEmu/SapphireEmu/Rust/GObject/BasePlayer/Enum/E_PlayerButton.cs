@@ -1,4 +1,4 @@
-﻿namespace SapphireEmu.Data.Base.GObject
+﻿namespace SapphireEmu.Rust
 {
     public enum E_PlayerButton
     {

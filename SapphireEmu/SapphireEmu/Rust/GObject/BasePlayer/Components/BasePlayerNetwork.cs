@@ -1,7 +1,5 @@
 ﻿using Network;
-using SapphireEmu.Data.Base;
-using SapphireEmu.Data.Base.GObject;
-using SapphireEngine;
+using SapphireEmu.Environment;
 using Message = Network.Message;
 
 namespace SapphireEmu.Rust.GObject.Component
@@ -46,7 +44,7 @@ namespace SapphireEmu.Rust.GObject.Component
                 this.PlayerOwner.Inventory.ContainerBelt.OnItemConainerUpdate();
             }
 
-            this.PlayerOwner.ClientRPCEx(new SendInfo(this.NetConnection), null, Data.Base.Network.RPCMethod.ERPCMethodType.FinishLoading);
+            this.PlayerOwner.ClientRPCEx(new SendInfo(this.NetConnection), null, ERPCMethodType.FinishLoading);
             this.PlayerOwner.SetPlayerFlag(E_PlayerFlags.ReceivingSnapshot, false);
             this.PlayerOwner.SendNetworkUpdate_PlayerFlags(new SendInfo(this.NetConnection));
         }
@@ -58,7 +56,7 @@ namespace SapphireEmu.Rust.GObject.Component
             if (this.PlayerOwner.IsConnected)
             {
                 this.PlayerOwner.SendNetworkUpdate(new SendInfo(this.NetConnection));
-                this.PlayerOwner.ClientRPCEx(new SendInfo(this.NetConnection), null, Data.Base.Network.RPCMethod.ERPCMethodType.StartLoading);
+                this.PlayerOwner.ClientRPCEx(new SendInfo(this.NetConnection), null, ERPCMethodType.StartLoading);
             }
         }
         #endregion

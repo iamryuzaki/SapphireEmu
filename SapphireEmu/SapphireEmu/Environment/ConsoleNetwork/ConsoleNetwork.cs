@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Network;
-using SapphireEmu.Environment;
 using SapphireEmu.Extended;
 using SapphireEngine;
 
-namespace SapphireEmu.Data.Base
+namespace SapphireEmu.Environment
 {
     public class ConsoleCommand : Attribute
     {
@@ -24,7 +23,7 @@ namespace SapphireEmu.Data.Base
         
         public static void Load()
         {
-            Type[] types = typeof(Network).Assembly.GetTypes();
+            Type[] types = typeof(RPCNetwork).Assembly.GetTypes();
             for (var i = 0; i < types.Length; i++)
             {
                 MethodInfo[] methods = types[i].GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);

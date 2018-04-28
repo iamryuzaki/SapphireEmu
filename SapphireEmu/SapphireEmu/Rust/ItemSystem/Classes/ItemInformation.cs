@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using SapphireEmu.Data.Base.GObject;
 using SapphireEmu.Rust.GObject;
-using SapphireEngine;
 
-namespace SapphireEmu.Data.Base
+namespace SapphireEmu.Rust
 {
     public enum ItemHeldType
     {

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Network;
-using ProtoBuf;
-using SapphireEmu.Data.Base.GObject.Component;
+using SapphireEmu.Environment;
 using SapphireEmu.Extended;
-using SapphireEngine;
+using SapphireEmu.Rust.GObject;
 
-namespace SapphireEmu.Rust.GObject.Component
+namespace SapphireEmu.Rust
 {
     public class ItemContainer
     {
@@ -54,14 +53,15 @@ namespace SapphireEmu.Rust.GObject.Component
         {
             if (this.EntityOwner is BasePlayer playerOwner)
             {
-                UpdateItemContainer container = new UpdateItemContainer
+                
+                ProtoBuf.UpdateItemContainer container = new ProtoBuf.UpdateItemContainer
                 {
                     container = new List<ProtoBuf.ItemContainer> {this.GetProtobufObject()},
                     type = (this.HasFlag(E_ItemContainerType.Belt) ? 1 : (this.HasFlag(E_ItemContainerType.Clothing) ? 2 : 0))
                 };
-                playerOwner.ClientRPCEx<UpdateItemContainer>(new SendInfo(playerOwner.Network.NetConnection),null, Data.Base.Network.RPCMethod.ERPCMethodType.UpdatedItemContainer, container);
+                playerOwner.ClientRPCEx<ProtoBuf.UpdateItemContainer>(new SendInfo(playerOwner.Network.NetConnection),null, ERPCMethodType.UpdatedItemContainer, container);
                 if (this.HasFlag(E_ItemContainerType.Clothing) || this.HasFlag(E_ItemContainerType.Belt))
-                    playerOwner.ClientRPCEx<UpdateItemContainer>(new SendInfo(playerOwner.ListViewToMe.ToConnectionsList()),null, Data.Base.Network.RPCMethod.ERPCMethodType.UpdatedItemContainer, container);
+                    playerOwner.ClientRPCEx<ProtoBuf.UpdateItemContainer>(new SendInfo(playerOwner.ListViewToMe.ToConnectionsList()),null, ERPCMethodType.UpdatedItemContainer, container);
             }
         }
 

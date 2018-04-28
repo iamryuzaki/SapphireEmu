@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SapphireEmu.Data.Base.GObject
+namespace SapphireEmu.Rust
 {
     [Flags]
     public enum E_PlayerFlags
@@ -21,6 +21,5 @@ namespace SapphireEmu.Data.Base.GObject
         ThirdPersonViewmode = 1024,
         VoiceMuted = 512,
         Wounded = 64
-        
     }
 }

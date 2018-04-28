@@ -1,13 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using Mono.Cecil;
-using SapphireEmu.Data;
+﻿using SapphireEmu.Data;
 using SapphireEmu.Data.Base;
+using SapphireEmu.Rust;
 using SapphireEmu.Rust.ZonaManager;
 using SapphireEngine;
-using SapphireEngine.Functions;
-using UnityEngine;
 
 namespace SapphireEmu.Environment
 {
@@ -37,9 +32,9 @@ namespace SapphireEmu.Environment
         
         private void Database_Initialization()
         {
-            Data.Base.DefaultMessages.Load();
-            Data.Base.Network.Load();
-            Data.Base.ConsoleNetwork.Load();
+            DefaultMessages.Load();
+            RPCNetwork.Load();
+            ConsoleNetwork.Load();
         }
         
     }

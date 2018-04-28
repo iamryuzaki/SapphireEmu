@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SapphireEmu.Data.Base.GObject.Component
+namespace SapphireEmu.Rust
 {
     [Flags]
     public enum E_ItemFlags

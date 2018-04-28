@@ -2,7 +2,7 @@
 {
     public partial class BaseEntity
     {
-        public enum Signal
+        public enum E_Signal
         {
             Attack,
             Alt_Attack,

@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Facepunch.Extend;
 using Network;
 using ProtoBuf;
-using SapphireEmu.Data.Base.GObject;
 using SapphireEmu.Environment;
 using SapphireEmu.Rust.GObject.Component;
 using SapphireEngine;
 using UnityEngine;
-using Item = ProtoBuf.Item;
-using ItemContainer = SapphireEmu.Rust.GObject.Component.ItemContainer;
 
 namespace SapphireEmu.Rust.GObject
 {
@@ -27,7 +22,7 @@ namespace SapphireEmu.Rust.GObject
 
         public BasePlayerInventory Inventory { get; private set; }
         public BasePlayerNetwork Network { get; private set; }
-        public Component.Item ActiveItem { get; set; } = null;
+        public Item ActiveItem { get; set; } = null;
 
         public E_PlayerFlags PlayerFlags = E_PlayerFlags.Sleeping;
         public E_PlayerButton PlayerButtons = 0;
@@ -168,13 +163,13 @@ namespace SapphireEmu.Rust.GObject
             this.SetPlayerFlag(E_PlayerFlags.ReceivingSnapshot, true);
             this.SendNetworkUpdate_PlayerFlags(new SendInfo(this.Network.NetConnection));
             
-            this.ClientRPCEx(new SendInfo(this.Network.NetConnection), null, Data.Base.Network.RPCMethod.ERPCMethodType.StartLoading);
+            this.ClientRPCEx(new SendInfo(this.Network.NetConnection), null, ERPCMethodType.StartLoading);
             
-            this.ClientRPCEx<Vector3>(_sendInfo, null, Data.Base.Network.RPCMethod.ERPCMethodType.ForcePositionTo, _vector3);
+            this.ClientRPCEx<Vector3>(_sendInfo, null, ERPCMethodType.ForcePositionTo, _vector3);
             
             this.OnPositionChanged();
             
-            this.ClientRPCEx(new SendInfo(this.Network.NetConnection), null, Data.Base.Network.RPCMethod.ERPCMethodType.FinishLoading);
+            this.ClientRPCEx(new SendInfo(this.Network.NetConnection), null, ERPCMethodType.FinishLoading);
             
             this.SetPlayerFlag(E_PlayerFlags.ReceivingSnapshot, false);
             this.SendNetworkUpdate_PlayerFlags(new SendInfo(this.Network.NetConnection));
@@ -210,17 +205,17 @@ namespace SapphireEmu.Rust.GObject
             }
             base.Hurt(damage, type, initiator);
             if (damage > 20)
-                this.ClientRPCEx<Vector3, int>(new SendInfo(this.Network.NetConnection), null, Data.Base.Network.RPCMethod.ERPCMethodType.DirectionalDamage, this.Position, (int)type);
+                this.ClientRPCEx<Vector3, int>(new SendInfo(this.Network.NetConnection), null, ERPCMethodType.DirectionalDamage, this.Position, (int)type);
         }
         #endregion
 
         #region [Methods] OnRPC Methods
 
-        [Data.Base.Network.RPCMethod(Data.Base.Network.RPCMethod.ERPCMethodType.MoveItem)]
+        [RPCMethod(ERPCMethodType.MoveItem)]
         void OnRPC_MoveItem(Message packet)
         {
             uint itemid = packet.read.UInt32();
-            if (Component.Item.ListItemsInWorld.TryGetValue(itemid, out Component.Item itemTarget))
+            if (Item.ListItemsInWorld.TryGetValue(itemid, out Item itemTarget))
             {
                 if (itemTarget.Container == null || itemTarget.Container.EntityOwner == this)
                 {
@@ -242,7 +237,7 @@ namespace SapphireEmu.Rust.GObject
                                     int lastPositon = itemTarget.PositionInContainer;
                                     lastContainer.RemoveItemFromContainer(itemTarget);
                                     
-                                    if (containerTarget.ListSlots.TryGetValue(slot, out Component.Item itemInNewPosition))
+                                    if (containerTarget.ListSlots.TryGetValue(slot, out Item itemInNewPosition))
                                     {
                                         containerTarget.RemoveItemFromContainer(itemInNewPosition);
                                         lastContainer.AddItemToContainer(itemInNewPosition, lastPositon);
@@ -266,7 +261,7 @@ namespace SapphireEmu.Rust.GObject
         }
         
         #region [Method] OnRPC_OnPlayerLanded
-        [Data.Base.Network.RPCMethod(Data.Base.Network.RPCMethod.ERPCMethodType.OnPlayerLanded)]
+        [RPCMethod(ERPCMethodType.OnPlayerLanded)]
         void OnRPC_OnPlayerLanded(Message packet)
         {
             float f = packet.read.Float();
@@ -301,7 +296,7 @@ namespace SapphireEmu.Rust.GObject
         
         #endregion
 
-        public void OnChangeActiveItem(Component.Item newItem)
+        public void OnChangeActiveItem(Item newItem)
         {
             if (this.ActiveItem?.HeldEntity != null)
             {
