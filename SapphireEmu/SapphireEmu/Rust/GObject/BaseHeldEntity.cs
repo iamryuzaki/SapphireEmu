@@ -28,7 +28,9 @@ namespace SapphireEmu.Rust.GObject
                 {
                     flags = (int)this.EntityFlags,
                     pos = this.PlayerOwner.Position,
-                    rot = this.Rotation
+                    rot = this.Rotation,
+                    skinid = 0,
+                    time = 1f
                 },
                 heldEntity = new ProtoBuf.HeldEntity
                 {

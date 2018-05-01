@@ -100,7 +100,7 @@ namespace SapphireEmu.Rust.GObject.Component
             }
             else
             {
-                if (this.PlayerOwner.ActiveItem?.UID != msg.activeItem)
+                if ((this.PlayerOwner.ActiveItem?.UID ?? 0)  != msg.activeItem)
                 {
                     this.PlayerOwner.OnChangeActiveItem(Item.ListItemsInWorld.TryGetValue(msg.activeItem, out Item item) ? item : null);
                     needUpdateFlags = true;

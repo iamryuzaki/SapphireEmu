@@ -13,8 +13,6 @@ namespace SapphireEmu.Rust.GObject
         public virtual void Hurt(float damage, E_DamageType type = E_DamageType.Generic, BaseCombatEntity initiator = null)
         {
             this.Health = damage > this.Health ? 0 : this.Health - damage;
-            if (this is BasePlayer player)
-                ConsoleSystem.Log($"'{player.Username}' hurt <{damage}>, new hp {this.Health}");
             this.SendNetworkUpdate();
         }
     }
