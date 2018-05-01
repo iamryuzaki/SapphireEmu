@@ -90,9 +90,15 @@ namespace SapphireEmu.Rust.GObject
         #region [Method] SendNetworkUpdate
         public virtual void SendNetworkUpdate(Entity _entity = null)
         {
-            if (this is BasePlayer player && player.IsConnected)
-                this.SendNetworkUpdate(new SendInfo(player.Network.NetConnection));
+            if (_entity == null)
+                _entity = GetEntityProtobuf();
             
+            if (this is BasePlayer player && player.IsConnected)
+            {
+                this.SendNetworkUpdate(new SendInfo(player.Network.NetConnection), _entity);
+                _entity.baseCombat.health = 0.01f;
+            }
+
             if (this.ListViewToMe.Count != 0)
                 this.SendNetworkUpdate(new SendInfo(this.ListViewToMe.ToConnectionsList()), _entity); 
         }

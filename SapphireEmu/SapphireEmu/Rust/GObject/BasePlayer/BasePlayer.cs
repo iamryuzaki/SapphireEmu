@@ -23,6 +23,7 @@ namespace SapphireEmu.Rust.GObject
         public BasePlayerInventory Inventory { get; private set; }
         public BasePlayerNetwork Network { get; private set; }
         public Item ActiveItem { get; set; } = null;
+        public UInt32 ActiveItemUID { get; set; } = 0;
 
         public E_PlayerFlags PlayerFlags = E_PlayerFlags.Sleeping;
         public E_PlayerButton PlayerButtons = 0;
@@ -68,7 +69,7 @@ namespace SapphireEmu.Rust.GObject
             for (var i = 0; i < this.Inventory.ContainerBelt.ListItems.Count; i++)
                 if (this.Inventory.ContainerBelt.ListItems[i].HeldEntity != null)
                     this.Inventory.ContainerBelt.ListItems[i].HeldEntity.SendNetworkUpdate();
-            
+
             return new Entity
             {
                 baseNetworkable = new ProtoBuf.BaseNetworkable
@@ -99,7 +100,7 @@ namespace SapphireEmu.Rust.GObject
                     skinCol = -1,
                     skinMesh = -1,
                     skinTex = -1,
-                    heldEntity = this.ActiveItem?.HeldEnityUID ?? 0
+                    heldEntity = this.ActiveItemUID
                 }
             };
         }
@@ -116,13 +117,17 @@ namespace SapphireEmu.Rust.GObject
                     prefabID = this.PrefabID,
                     uid = this.UID
                 },
+                baseCombat = new BaseCombat
+                {
+                    health = this.Health
+                },
                 basePlayer = new ProtoBuf.BasePlayer
                 {
                     userid = this.SteamID,
                     name = this.Username,
                     playerFlags = (int) this.PlayerFlags,
                     modelState = new ModelState {flags = (int) this.PlayerModelState},
-                    heldEntity = this.ActiveItem?.HeldEnityUID ?? 0
+                    heldEntity = this.ActiveItemUID,
                 }
             };
         }
@@ -132,18 +137,22 @@ namespace SapphireEmu.Rust.GObject
         #region [Method] SendNetworkUpdate_PlayerFlags
         public void SendNetworkUpdate_PlayerFlags() 
         {
+            Entity entity = GetEntityProtobuf_PlayerFlags();
+            
             if (this.IsConnected)
-                this.SendNetworkUpdate_PlayerFlags(new SendInfo(this.Network.NetConnection));
+                this.SendNetworkUpdate_PlayerFlags(new SendInfo(this.Network.NetConnection), entity);
+
+            entity.baseCombat.health = 0.01f;
             
             if (this.ListViewToMe.Count != 0)
-                this.SendNetworkUpdate_PlayerFlags(new SendInfo(Extended.Rust.ToConnectionsList(ListViewToMe)));
+                this.SendNetworkUpdate_PlayerFlags(new SendInfo(Extended.Rust.ToConnectionsList(ListViewToMe)), entity);
         }
-        public void SendNetworkUpdate_PlayerFlags(SendInfo sendInfo)
+        public void SendNetworkUpdate_PlayerFlags(SendInfo sendInfo, Entity _entity = null)
         {
+            if (_entity == null)
+                _entity = GetEntityProtobuf_PlayerFlags();
             
-            Entity entity = GetEntityProtobuf_PlayerFlags();
-
-            this.SendNetworkUpdate(sendInfo, entity);
+            this.SendNetworkUpdate(sendInfo, _entity);
         }
         #endregion
 
@@ -196,14 +205,26 @@ namespace SapphireEmu.Rust.GObject
         #region [Method] Hurt
         public override void Hurt(float damage, E_DamageType type = E_DamageType.Generic, BaseCombatEntity initiator = null)
         {
-            if (damage >= this.Health && this.HasPlayerFlag(E_PlayerFlags.Wounded) == false)
+            if (damage >= this.Health)
             {
-                this.Health = 5f;
-                this.SetPlayerFlag(E_PlayerFlags.Wounded, true);
+                if (this.HasPlayerFlag(E_PlayerFlags.Wounded) == false)
+                {
+                    // Wounded
+                    this.Health = 5f;
+                    this.SetPlayerFlag(E_PlayerFlags.Wounded, true);
+                }
+                else
+                {
+                    // Death
+                    this.Health = 0f;
+                    this.SetPlayerFlag(E_PlayerFlags.Wounded, false);
+                }
                 this.SendNetworkUpdate_PlayerFlags();
                 return;
             }
-            base.Hurt(damage, type, initiator);
+            this.Health = this.Health - damage;
+            this.SendNetworkUpdate_PlayerFlags();
+            
             if (damage > 20)
                 this.ClientRPCEx<Vector3, int>(new SendInfo(this.Network.NetConnection), null, ERPCMethodType.DirectionalDamage, this.Position, (int)type);
         }
@@ -211,6 +232,17 @@ namespace SapphireEmu.Rust.GObject
 
         #region [Methods] OnRPC Methods
 
+        [RPCMethod(ERPCMethodType.Assist)]
+        void OnRPC_Assist(Message packet)
+        {
+            if (this.HasPlayerFlag(E_PlayerFlags.Wounded))
+            {
+                this.SetPlayerFlag(E_PlayerFlags.Wounded, false);
+                this.Health = 5;
+                this.SendNetworkUpdate_PlayerFlags();
+            }
+        }
+        
         [RPCMethod(ERPCMethodType.MoveItem)]
         void OnRPC_MoveItem(Message packet)
         {
@@ -306,11 +338,14 @@ namespace SapphireEmu.Rust.GObject
                 this.ActiveItem.HeldEntity.SendNetworkUpdate();
             }
             this.ActiveItem = newItem;
+            this.ActiveItemUID = this.ActiveItem?.HeldEnityUID ?? 0;
+            
             if (this.ActiveItem?.HeldEntity != null)
             {
                 this.ActiveItem.HeldEntity.SetHeld(true);
                 this.ActiveItem.HeldEntity.SendNetworkUpdate();
             }
+            ConsoleSystem.Log($"{this.Username} have active heldEntity: {(this.ActiveItemUID)}");
         }
     }
 }

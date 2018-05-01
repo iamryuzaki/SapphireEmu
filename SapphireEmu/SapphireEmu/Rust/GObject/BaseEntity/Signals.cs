@@ -19,22 +19,14 @@ namespace SapphireEmu.Rust.GObject
         #region [Methods] Send Signals
         public void SignalBroadcast(E_Signal eSignal, string arg, Connection sourceConnection = null)
         {
-            SendInfo sendInfo = new SendInfo(base.ListViewToMe.ToConnectionsList())
-            {
-                method = SendMethod.Unreliable,
-                priority = Priority.Immediate
-            };
-            this.ClientRPCEx<int, string>(sendInfo, sourceConnection, ERPCMethodType.SignalFromServerEx, (int)eSignal, arg);
+            SendInfo sendInfo = new SendInfo(this.ListViewToMe.ToConnectionsList());
+            this.ClientRPCEx<int, string>(sendInfo, null, ERPCMethodType.SignalFromServerEx, (int)eSignal, arg);
         }
 
         public void SignalBroadcast(E_Signal eSignal, Connection sourceConnection = null)
         {
-            SendInfo sendInfo = new SendInfo(base.ListViewToMe.ToConnectionsList())
-            {
-                method = SendMethod.Unreliable,
-                priority = Priority.Immediate
-            };
-            this.ClientRPCEx<int>(sendInfo, sourceConnection, ERPCMethodType.SignalFromServer, (int)eSignal);
+            SendInfo sendInfo = new SendInfo(this.ListViewToMe.ToConnectionsList());
+            this.ClientRPCEx<int>(sendInfo, null, ERPCMethodType.SignalFromServer, (int)eSignal);
         }
         #endregion
     }

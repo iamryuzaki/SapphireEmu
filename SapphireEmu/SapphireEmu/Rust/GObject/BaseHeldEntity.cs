@@ -29,7 +29,9 @@ namespace SapphireEmu.Rust.GObject
                 {
                     flags = (int)this.EntityFlags,
                     pos = Vector3.zero,
-                    rot = Vector3.zero
+                    rot = Vector3.zero,
+                    skinid = 0,
+                    time = 1f
                 },
                 heldEntity = new ProtoBuf.HeldEntity
                 {
