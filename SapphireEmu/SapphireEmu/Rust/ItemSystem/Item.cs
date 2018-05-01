@@ -52,6 +52,7 @@ namespace SapphireEmu.Rust
                 this.HeldEntity = (BaseHeldEntity)Framework.Bootstraper.AddType(type);
                 this.HeldEntity.ItemOwner = this;
                 this.HeldEntity.Spawn(this.Information.HeldEntity.PrefabID);
+                this.HeldEntity.SendNetworkUpdate();
             }
         }
 

@@ -39,8 +39,8 @@ namespace SapphireEmu.Rust.GObject
                 },
                 parent = new ProtoBuf.ParentInfo
                 {
-                    uid = this.PlayerOwner.UID,
-                    bone = 3354652700
+                    uid = this.PlayerOwner?.UID ?? 0,
+                    bone =this.PlayerOwner?.UID > 0 ?  3354652700 : 0
                 }
             };
         }
@@ -54,12 +54,13 @@ namespace SapphireEmu.Rust.GObject
 
 
 
+        // Override because we need get ListViewToMe from owner player, not our ListViewToMe
         public override void SendNetworkUpdate(ProtoBuf.Entity _entity = null)
         {
             if (this.PlayerOwner != null && this.PlayerOwner.IsConnected)
                 this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.Network.NetConnection), _entity);
             
-            if (this.ListViewToMe.Count != 0)
+            if ((this.PlayerOwner?.ListViewToMe.Count ?? 0) != 0)
                 this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.ListViewToMe.ToConnectionsList()), _entity);
         }
     }

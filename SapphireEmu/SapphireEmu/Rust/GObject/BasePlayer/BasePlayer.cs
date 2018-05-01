@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Network;
 using ProtoBuf;
 using SapphireEmu.Environment;
 using SapphireEmu.Rust.GObject.Component;
 using SapphireEngine;
 using UnityEngine;
+using Timer = SapphireEngine.Functions.Timer;
 
 namespace SapphireEmu.Rust.GObject
 {
@@ -23,7 +25,7 @@ namespace SapphireEmu.Rust.GObject
         public BasePlayerInventory Inventory { get; private set; }
         public BasePlayerNetwork Network { get; private set; }
         public Item ActiveItem { get; set; } = null;
-        public UInt32 ActiveItemUID { get; set; } = 0;
+        public UInt32 ActiveItemUID => ActiveItem?.HeldEnityUID ?? 0;
 
         public E_PlayerFlags PlayerFlags = E_PlayerFlags.Sleeping;
         public E_PlayerButton PlayerButtons = 0;
@@ -119,7 +121,8 @@ namespace SapphireEmu.Rust.GObject
                 },
                 baseCombat = new BaseCombat
                 {
-                    health = this.Health
+                    health = this.Health,
+                    state = (int)this.LifeState
                 },
                 basePlayer = new ProtoBuf.BasePlayer
                 {
@@ -207,18 +210,19 @@ namespace SapphireEmu.Rust.GObject
         {
             if (damage >= this.Health)
             {
-                if (this.HasPlayerFlag(E_PlayerFlags.Wounded) == false)
-                {
-                    // Wounded
-                    this.Health = 5f;
-                    this.SetPlayerFlag(E_PlayerFlags.Wounded, true);
-                }
-                else
-                {
+//                if (this.HasPlayerFlag(E_PlayerFlags.Wounded) == false)
+//                {
+//                    // Wounded
+//                    this.Health = 5f;
+//                    this.SetPlayerFlag(E_PlayerFlags.Wounded, true);
+//                }
+//                else
+//                {
                     // Death
                     this.Health = 0f;
                     this.SetPlayerFlag(E_PlayerFlags.Wounded, false);
-                }
+                ClientRPCEx(new SendInfo(this.Network.NetConnection), null, ERPCMethodType.OnDied);
+//                }
                 this.SendNetworkUpdate_PlayerFlags();
                 return;
             }
@@ -338,7 +342,6 @@ namespace SapphireEmu.Rust.GObject
                 this.ActiveItem.HeldEntity.SendNetworkUpdate();
             }
             this.ActiveItem = newItem;
-            this.ActiveItemUID = this.ActiveItem?.HeldEnityUID ?? 0;
             
             if (this.ActiveItem?.HeldEntity != null)
             {
@@ -346,6 +349,13 @@ namespace SapphireEmu.Rust.GObject
                 this.ActiveItem.HeldEntity.SendNetworkUpdate();
             }
             ConsoleSystem.Log($"{this.Username} have active heldEntity: {(this.ActiveItemUID)}");
+        }
+
+        public void Respawn()
+        {
+            this.Position = new Vector3(0, 2, 0);
+            this.Health = 100;
+            this.SendSleepingStart();
         }
     }
 }

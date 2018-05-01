@@ -1,5 +1,8 @@
-﻿namespace SapphireEmu.Rust
+﻿using System;
+
+namespace SapphireEmu.Rust
 {
+    [Flags]
     public enum E_PlayerModelState
     {
         Aiming = 0x80,

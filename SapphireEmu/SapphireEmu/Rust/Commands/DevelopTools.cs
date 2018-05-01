@@ -1,6 +1,7 @@
 ﻿using SapphireEmu.Environment;
 using SapphireEmu.Rust.GObject;
 using SapphireEngine;
+using SapphireEngine.Functions;
 using UnityEngine;
 
 namespace SapphireEmu.Rust.Commands
@@ -21,10 +22,12 @@ namespace SapphireEmu.Rust.Commands
             player.Inventory.ContainerBelt.AddItemToContainer(ItemManager.CreateByPartialName("rifle.ak"));
             player.Inventory.ContainerBelt.OnItemConainerUpdate();
             player.ActiveItem = player.Inventory.ContainerBelt.ListItems[0];
-            player.PlayerModelState = E_PlayerModelState.OnGround;
+            player.SetPlayerFlag(E_PlayerFlags.Aiming, true);
             player.ActiveItem.HeldEntity.SetHeld(true);
             player.ActiveItem.HeldEntity.SendNetworkUpdate();
             player.SendNetworkUpdate();
+            Timer.SetTimeout(() => { player.OnChangeActiveItem(null); }, 1f);
+            ConsoleSystem.Log(player.ActiveItem.HeldEntity.ItemOwner.UID.ToString());
         }
     }
 }

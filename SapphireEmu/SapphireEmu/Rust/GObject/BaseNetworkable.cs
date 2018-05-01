@@ -199,7 +199,7 @@ namespace SapphireEmu.Rust.GObject
                 NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.RPCMessage);
                 NetworkManager.BaseNetworkServer.write.UInt32(this.UID);
                 NetworkManager.BaseNetworkServer.write.UInt32((uint)method);
-                NetworkManager.BaseNetworkServer.write.UInt64((sourceConnection != null) ? sourceConnection.userid : ((ulong) 0L));
+                NetworkManager.BaseNetworkServer.write.UInt64(sourceConnection?.userid ??  0UL);
                 return true;
             }
             return false;

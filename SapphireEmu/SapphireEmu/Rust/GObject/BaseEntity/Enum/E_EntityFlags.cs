@@ -5,22 +5,22 @@ namespace SapphireEmu.Data.Base.GObject
     [Flags]
     public enum E_EntityFlags
     {
-        Broken = 0x1000,
-        Busy = 0x2000,
-        Debugging = 0x20,
-        Disabled = 0x40,
-        Locked = 0x10,
+        Placeholder = 1,
         On = 2,
         OnFire = 4,
         Open = 8,
-        Placeholder = 1,
-        Reserved1 = 0x80,
-        Reserved2 = 0x100,
-        Reserved3 = 0x200,
-        Reserved4 = 0x400,
-        Reserved5 = 0x800,
-        Reserved6 = 0x4000,
-        Reserved7 = 0x8000,
-        Reserved8 = 0x10000
+        Locked = 16,
+        Debugging = 32,
+        Disabled = 64,
+        Reserved1 = 128,
+        Reserved2 = 256,
+        Reserved3 = 512,
+        Reserved4 = 1024,
+        Reserved5 = 2048,
+        Broken = 4096,
+        Busy = 8192,
+        Reserved6 = 16384,
+        Reserved7 = 32768,
+        Reserved8 = 65536
     }
 }
