@@ -50,6 +50,7 @@
     <Compile Include="Extended\Reflection.cs" />
     <Compile Include="Extended\Rust.cs" />
     <Compile Include="Extended\String.cs" />
+    <Compile Include="Rust\Commands\DevelopTools.cs" />
     <Compile Include="Rust\Commands\Inventory.cs" />
     <Compile Include="Rust\GObject\BaseCombatEntity\BaseCombatEntity.cs" />
     <Compile Include="Rust\GObject\BaseCombatEntity\Enum\E_DamageType.cs" />

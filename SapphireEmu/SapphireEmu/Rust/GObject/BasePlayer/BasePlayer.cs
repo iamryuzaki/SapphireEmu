@@ -305,7 +305,6 @@ namespace SapphireEmu.Rust.GObject
                 this.ActiveItem.HeldEntity.SetHeld(false);
                 this.ActiveItem.HeldEntity.SendNetworkUpdate();
             }
-
             this.ActiveItem = newItem;
             if (this.ActiveItem?.HeldEntity != null)
             {

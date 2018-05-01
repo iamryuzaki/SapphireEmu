@@ -47,6 +47,8 @@ namespace SapphireEmu.Rust.GObject.Component
             this.PlayerOwner.ClientRPCEx(new SendInfo(this.NetConnection), null, ERPCMethodType.FinishLoading);
             this.PlayerOwner.SetPlayerFlag(E_PlayerFlags.ReceivingSnapshot, false);
             this.PlayerOwner.SendNetworkUpdate_PlayerFlags(new SendInfo(this.NetConnection));
+
+            this.NetConnection.authLevel = 2;
         }
         #endregion
 

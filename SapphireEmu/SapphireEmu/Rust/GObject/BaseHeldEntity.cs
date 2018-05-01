@@ -1,6 +1,7 @@
 ﻿using Network;
 using SapphireEmu.Data.Base.GObject;
 using SapphireEmu.Extended;
+using UnityEngine;
 
 namespace SapphireEmu.Rust.GObject
 {
@@ -27,8 +28,8 @@ namespace SapphireEmu.Rust.GObject
                 baseEntity = new ProtoBuf.BaseEntity
                 {
                     flags = (int)this.EntityFlags,
-                    pos = this.PlayerOwner.Position,
-                    rot = this.Rotation
+                    pos = Vector3.zero,
+                    rot = Vector3.zero
                 },
                 heldEntity = new ProtoBuf.HeldEntity
                 {

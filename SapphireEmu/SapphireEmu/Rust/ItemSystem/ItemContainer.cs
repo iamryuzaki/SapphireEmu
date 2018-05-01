@@ -59,7 +59,8 @@ namespace SapphireEmu.Rust
                     container = new List<ProtoBuf.ItemContainer> {this.GetProtobufObject()},
                     type = (this.HasFlag(E_ItemContainerType.Belt) ? 1 : (this.HasFlag(E_ItemContainerType.Clothing) ? 2 : 0))
                 };
-                playerOwner.ClientRPCEx<ProtoBuf.UpdateItemContainer>(new SendInfo(playerOwner.Network.NetConnection),null, ERPCMethodType.UpdatedItemContainer, container);
+                if (playerOwner.IsConnected)
+                    playerOwner.ClientRPCEx<ProtoBuf.UpdateItemContainer>(new SendInfo(playerOwner.Network.NetConnection),null, ERPCMethodType.UpdatedItemContainer, container);
                 if (this.HasFlag(E_ItemContainerType.Clothing) || this.HasFlag(E_ItemContainerType.Belt))
                     playerOwner.ClientRPCEx<ProtoBuf.UpdateItemContainer>(new SendInfo(playerOwner.ListViewToMe.ToConnectionsList()),null, ERPCMethodType.UpdatedItemContainer, container);
             }

@@ -8,7 +8,7 @@ namespace SapphireEmu.Rust.GObject
         public Boolean IsAlive => this.Health != 0;
         
         public float Health = 100f;
-        public E_LifeState LifeState => this.Health != 0 ? E_LifeState.Alive : E_LifeState.Dead;
+        public E_LifeState LifeState => Math.Abs(this.Health) > 0.01 ? E_LifeState.Alive : E_LifeState.Dead;
 
         public virtual void Hurt(float damage, E_DamageType type = E_DamageType.Generic, BaseCombatEntity initiator = null)
         {
