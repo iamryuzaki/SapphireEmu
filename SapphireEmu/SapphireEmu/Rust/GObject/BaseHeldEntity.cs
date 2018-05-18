@@ -1,4 +1,6 @@
-﻿using Network;
+﻿using System.Collections.Generic;
+using Facepunch;
+using Network;
 using SapphireEmu.Data.Base.GObject;
 using SapphireEmu.Extended;
 using UnityEngine;
@@ -8,60 +10,105 @@ namespace SapphireEmu.Rust.GObject
     public class BaseHeldEntity : BaseEntity
     {
         public Item ItemOwner { get; set; }
-        public BasePlayer PlayerOwner => (BasePlayer)this.ItemOwner.Container?.EntityOwner;
+        public BasePlayer PlayerOwner => (BasePlayer)this.ItemOwner?.Container?.EntityOwner;
 
+        public const uint HandBone = 3354652700u;
+        
         public override void OnAwake()
         {
             base.IsComponent = true;
         }
         
-        public override ProtoBuf.Entity GetEntityProtobuf()
+
+        public void Initialization()
         {
-            return new ProtoBuf.Entity
+            this.ItemOwner.OnParentChanged += OnItemParentChanged;
+        }
+        
+        private void OnItemParentChanged(Item item)
+        {
+            if (this.ParentToPlayer(item))
             {
-                baseNetworkable = new ProtoBuf.BaseNetworkable
-                {
-                    @group = 0,
-                    prefabID = this.PrefabID,
-                    uid = this.UID
-                },
-                baseEntity = new ProtoBuf.BaseEntity
-                {
-                    flags = (int)this.EntityFlags,
-                    pos = Vector3.zero,
-                    rot = Vector3.zero,
-                    skinid = 0,
-                    time = 1f
-                },
-                heldEntity = new ProtoBuf.HeldEntity
-                {
-                    itemUID = this.ItemOwner.UID
-                },
-                parent = new ProtoBuf.ParentInfo
-                {
-                    uid = this.PlayerOwner?.UID ?? 0,
-                    bone =this.PlayerOwner?.UID > 0 ?  3354652700 : 0
-                }
+                return;
+            }
+            this.SetParent(null, 0);
+            this.limitNetworking = true;
+            this.SetFlag(E_EntityFlags.Disabled, true);
+            this.SendNetworkUpdate();
+        }
+        
+        private bool ParentToPlayer(Item item)
+        {
+            BasePlayer ownerPlayer = item?.Container?.EntityOwner as BasePlayer;
+            if (ownerPlayer == null)
+            {
+                this.ClearOwnerPlayer();
+                return true;
+            }
+            this.SetOwnerPlayer(ownerPlayer);
+            this.SendNetworkUpdate();
+            return true;
+        }
+        
+        public override void GetEntityProtobuf(ProtoBuf.Entity entity)
+        {
+            base.GetEntityProtobuf(entity);
+            
+            entity.heldEntity = new ProtoBuf.HeldEntity
+            {
+                itemUID = this.ItemOwner?.UID ?? 0
             };
         }
         
+        private void InitOwnerPlayer()
+        {
+            if (!(this.GetParent() is BasePlayer ownerPlayer))
+            {
+                this.ClearOwnerPlayer();
+            }
+            else
+            {
+                this.SetOwnerPlayer(ownerPlayer);
+            }
+            this.SendNetworkUpdate();
+        }
+        
+        public virtual void ClearOwnerPlayer()
+        {
+            base.SetParent(null, 0);
+            this.SetHeld(false);
+        }
+        public virtual void SetOwnerPlayer(BasePlayer player)
+        {
+            base.SetParent(player, HandBone);
+            this.SetHeld(false);
+        }
         
         public void SetHeld(bool bHeld)
         {
             base.SetFlag(E_EntityFlags.Reserved4, bHeld);
+            base.limitNetworking = !bHeld;
             base.SetFlag(E_EntityFlags.Disabled, !bHeld);
         }
 
-
+        public override List<BasePlayer> GetSubscribers()
+        {
+            return this.PlayerOwner?.ListViewToMe ?? Pool.GetList<BasePlayer>();
+        }
 
         // Override because we need get ListViewToMe from owner player, not our ListViewToMe
         public override void SendNetworkUpdate(ProtoBuf.Entity _entity = null)
         {
             if (this.PlayerOwner != null && this.PlayerOwner.IsConnected)
                 this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.Network.NetConnection), _entity);
-            
+
             if ((this.PlayerOwner?.ListViewToMe.Count ?? 0) != 0)
                 this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.ListViewToMe.ToConnectionsList()), _entity);
+
+            if (this.PlayerOwner == null && BasePlayer.ListOnlinePlayers.Count > 0)
+            {
+                this.SendNetworkUpdate(new SendInfo(BasePlayer.ListOnlinePlayers.ToConnectionsList()), _entity);
+            }
         }
     }
 }

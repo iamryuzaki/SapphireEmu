@@ -16,7 +16,7 @@ namespace SapphireEmu.Rust.GObject
         public static Dictionary<UInt64, BasePlayer> ListPlayers = new Dictionary<ulong, BasePlayer>();
         public static List<BasePlayer> ListOnlinePlayers = new List<BasePlayer>();
 
-        public Boolean IsConnected => this.Network.NetConnection != null && this.Network.NetConnection.connected;
+        public Boolean IsConnected => Network.NetConnection?.connected == true;
         public Boolean IsSleeping => this.HasPlayerFlag(E_PlayerFlags.Sleeping);
         
         public UInt64 SteamID = 0UL;
@@ -25,11 +25,11 @@ namespace SapphireEmu.Rust.GObject
         public BasePlayerInventory Inventory { get; private set; }
         public BasePlayerNetwork Network { get; private set; }
         public Item ActiveItem { get; set; } = null;
-        public UInt32 ActiveItemUID => ActiveItem?.HeldEnityUID ?? 0;
+        public UInt32 ActiveItemUID => ActiveItem?.UID ?? 0;
 
         public E_PlayerFlags PlayerFlags = E_PlayerFlags.Sleeping;
         public E_PlayerButton PlayerButtons = 0;
-        public E_PlayerModelState PlayerModelState = E_PlayerModelState.Sleeping;
+        public ModelState PlayerModelState = new ModelState() {flags = (int)E_PlayerModelState.Sleeping, waterLevel = 0, lookDir = Vector3.forward, poseType = 0};
 
         #region [Method] Awake
         public override void OnAwake()
@@ -66,44 +66,26 @@ namespace SapphireEmu.Rust.GObject
         #region [Methods] GetEntityProtobuf
         #region [Method] GetEntityProtobuf
         
-        public override Entity GetEntityProtobuf()
+        public override void GetEntityProtobuf(Entity entity)
         {
+            base.GetEntityProtobuf(entity);
+            
             for (var i = 0; i < this.Inventory.ContainerBelt.ListItems.Count; i++)
                 if (this.Inventory.ContainerBelt.ListItems[i].HeldEntity != null)
                     this.Inventory.ContainerBelt.ListItems[i].HeldEntity.SendNetworkUpdate();
 
-            return new Entity
+            entity.basePlayer = new ProtoBuf.BasePlayer
             {
-                baseNetworkable = new ProtoBuf.BaseNetworkable
-                {
-                    @group = 0,
-                    prefabID = this.PrefabID,
-                    uid = this.UID
-                },
-                baseCombat = new BaseCombat
-                {
-                    health = this.Health,
-                    state = (int) this.LifeState,
-                },
-                baseEntity = new ProtoBuf.BaseEntity
-                {
-                    flags = (int) this.EntityFlags,
-                    pos = this.Position,
-                    rot = this.Rotation
-                },
-                basePlayer = new ProtoBuf.BasePlayer
-                {
-                    userid = this.SteamID,
-                    name = this.Username,
-                    playerFlags = (int) this.PlayerFlags,
-                    modelState = new ModelState {flags = (int) this.PlayerModelState},
-                    health = this.Health,
-                    inventory = this.Inventory.GetProtobufObject(),
-                    skinCol = -1,
-                    skinMesh = -1,
-                    skinTex = -1,
-                    heldEntity = this.ActiveItemUID
-                }
+                userid = this.SteamID,
+                name = this.Username,
+                playerFlags = (int) this.PlayerFlags,
+                modelState = this.PlayerModelState,
+                health = this.Health,
+                inventory = this.Inventory.GetProtobufObject(),
+                skinCol = -1,
+                skinMesh = -1,
+                skinTex = -1,
+                heldEntity = this.ActiveItemUID
             };
         }
         #endregion
@@ -129,7 +111,7 @@ namespace SapphireEmu.Rust.GObject
                     userid = this.SteamID,
                     name = this.Username,
                     playerFlags = (int) this.PlayerFlags,
-                    modelState = new ModelState {flags = (int) this.PlayerModelState},
+                    modelState = this.PlayerModelState,
                     heldEntity = this.ActiveItemUID,
                 }
             };
@@ -194,7 +176,7 @@ namespace SapphireEmu.Rust.GObject
         {
             this.OnChangeActiveItem(null);
             this.SetPlayerFlag(E_PlayerFlags.Sleeping, true);
-            this.PlayerModelState = E_PlayerModelState.Sleeping;
+            this.PlayerModelState.flags = (int)E_PlayerModelState.Sleeping;
             this.SendNetworkUpdate_PlayerFlags();
         }
 

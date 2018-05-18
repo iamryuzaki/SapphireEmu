@@ -26,39 +26,16 @@ namespace SapphireEmu.Rust.GObject
         }
         #endregion
         
-        public override Entity GetEntityProtobuf()
+        public override void GetEntityProtobuf(Entity entity)
         {
-            return new Entity
+            base.GetEntityProtobuf(entity);
+            entity.baseProjectile = new ProtoBuf.BaseProjectile()
             {
-                baseNetworkable = new ProtoBuf.BaseNetworkable
+                primaryMagazine = new Magazine()
                 {
-                    @group = 0,
-                    prefabID = this.PrefabID,
-                    uid = this.UID
-                },
-                baseEntity = new ProtoBuf.BaseEntity
-                {
-                    flags = (int)this.EntityFlags,
-                    pos = Vector3.zero,
-                    rot = Vector3.zero
-                },
-                heldEntity = new HeldEntity
-                {
-                    itemUID = this.ItemOwner.UID
-                },
-                baseProjectile = new ProtoBuf.BaseProjectile()
-                {
-                    primaryMagazine = new Magazine()
-                    {
-                        ammoType = this.AmmoType,
-                        capacity = this.AmmoMax,
-                        contents = this.AmmoCount
-                    }
-                },
-                parent = new ParentInfo
-                {
-                    uid = this.PlayerOwner.UID,
-                    bone = 3354652700
+                    ammoType = this.AmmoType,
+                    capacity = this.AmmoMax,
+                    contents = this.AmmoCount
                 }
             };
         }

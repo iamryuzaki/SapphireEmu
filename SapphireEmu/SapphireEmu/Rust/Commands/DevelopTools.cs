@@ -14,20 +14,19 @@ namespace SapphireEmu.Rust.Commands
             var player = Framework.Bootstraper.AddType<BasePlayer>();
             player.SteamID = (ulong)(new System.Random()).Next(0, 1000000);
             player.Position = new Vector3(0,4,0);
-            BasePlayer.ListPlayers.Add(player.SteamID, player);
-            player.Spawn((uint) Data.Base.PrefabID.BasePlayer);
+            player.PlayerModelState.sleeping = false;
+            player.PlayerModelState.onground = true;
             player.SetPlayerFlag(E_PlayerFlags.Sleeping, false);
-            player.SendNetworkUpdate_PlayerFlags();
-            
+            player.Spawn((uint) Data.Base.PrefabID.BasePlayer);
+
             player.Inventory.ContainerBelt.AddItemToContainer(ItemManager.CreateByPartialName("rifle.ak"));
-            player.Inventory.ContainerBelt.OnItemConainerUpdate();
-            player.ActiveItem = player.Inventory.ContainerBelt.ListItems[0];
-            player.SetPlayerFlag(E_PlayerFlags.Aiming, true);
-            player.ActiveItem.HeldEntity.SetHeld(true);
-            player.ActiveItem.HeldEntity.SendNetworkUpdate();
+            player.OnChangeActiveItem(player.Inventory.ContainerBelt.ListItems[0]);
             player.SendNetworkUpdate();
-            Timer.SetTimeout(() => { player.OnChangeActiveItem(null); }, 1f);
-            ConsoleSystem.Log(player.ActiveItem.HeldEntity.ItemOwner.UID.ToString());
+//            Timer.SetInterval(() =>
+//            {
+//                player.SignalBroadcast(BaseEntity.E_Signal.Alt_Attack);
+//                ConsoleSystem.Log($"count => {player.ListViewToMe.Count}");
+//            }, 1f);
         }
     }
 }

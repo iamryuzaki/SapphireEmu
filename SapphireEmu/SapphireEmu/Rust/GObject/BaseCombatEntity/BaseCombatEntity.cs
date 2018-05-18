@@ -1,4 +1,5 @@
 ﻿using System;
+using ProtoBuf;
 using SapphireEngine;
 
 namespace SapphireEmu.Rust.GObject
@@ -14,6 +15,17 @@ namespace SapphireEmu.Rust.GObject
         {
             this.Health = damage > this.Health ? 0 : this.Health - damage;
             this.SendNetworkUpdate();
+        }
+
+        public override void GetEntityProtobuf(Entity entity)
+        {
+            base.GetEntityProtobuf(entity);
+
+            entity.baseCombat = new BaseCombat
+            {
+                health = this.Health,
+                state = (int) this.LifeState,
+            };
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Network;
 using SapphireEmu.Environment;
+using SapphireEngine;
 using Message = Network.Message;
 
 namespace SapphireEmu.Rust.GObject.Component
@@ -85,9 +86,9 @@ namespace SapphireEmu.Rust.GObject.Component
             
             PlayerTick msg = PlayerTick.Deserialize(_message.read, this.m_lastPlayerTickPacket, true);
             this.PlayerOwner.PlayerButtons = (E_PlayerButton)msg.inputState.buttons;
-            if (this.PlayerOwner.PlayerModelState != (E_PlayerModelState) msg.modelState.flags)
+            if (ModelState.Equal(this.PlayerOwner.PlayerModelState, msg.modelState) == false)
             {
-                this.PlayerOwner.PlayerModelState = (E_PlayerModelState) msg.modelState.flags;
+                this.PlayerOwner.PlayerModelState = msg.modelState;
                 needUpdateFlags = true;
             }
 

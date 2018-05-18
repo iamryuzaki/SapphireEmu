@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Facepunch;
 using Network;
 using ProtoBuf;
 using SapphireEmu.Environment;
@@ -29,9 +30,96 @@ namespace SapphireEmu.Rust.GObject
         public Vector3 Rotation = Vector3.zero;
         public GameZona CurentGameZona = null;
         public Boolean IsComponent { get; set; } = false;
-
+        
+        public bool _limitedNetworking;
+        
         // Which player is subscribed to me and view me
         public List<BasePlayer> ListViewToMe = new List<BasePlayer>();
+
+        #region [Property] LimitNetworking
+        public bool limitNetworking
+        {
+            get => this._limitedNetworking;
+            set
+            {
+                if (value == this._limitedNetworking)
+                {
+                    return;
+                }
+                this._limitedNetworking = value;
+                if (!this._limitedNetworking)
+                {
+                    this.OnNetworkLimitEnd();
+                }
+                else
+                {
+                    this.OnNetworkLimitStart();
+                }
+            }
+        }
+        #endregion
+
+        #region [Methods] NetworkLimit [Start|End]
+        private void OnNetworkLimitStart()
+        {
+            List<Connection> subscribers = this.GetSubscribers().Where(p=>p.IsConnected).Select(p=>p.Network.NetConnection).ToList();
+            if (subscribers.Count == 0)
+            {
+                return;
+            }
+//            subscribers.RemoveAll((Connection x) => this.ShouldNetworkTo(x.player as BasePlayer));
+            this.OnNetworkSubscribersLeave(subscribers);
+            var children = (this as BaseEntity)?.Children;
+            if (children != null && children.Count > 0)
+            {
+                foreach (BaseEntity child in children)
+                {
+                    child.OnNetworkLimitStart();
+                }
+            }
+        }
+        
+        private void OnNetworkLimitEnd()
+            {
+                this.SendNetworkUpdate();
+                var children = (this as BaseEntity)?.Children;
+                if (children != null && children.Count > 0)
+                {
+                    foreach (BaseEntity child in children)
+                    {
+                        child.OnNetworkLimitEnd();
+                    }
+                }
+            }
+        #endregion
+
+        #region [Methods] Visibility
+
+        public void OnNetworkSubscribersLeave(List<Connection> connections)
+        {
+            if (!NetworkManager.BaseNetworkServer.IsConnected())
+            {
+                return;
+            }
+            
+            if (NetworkManager.BaseNetworkServer.write.Start())
+            {
+                NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.EntityDestroy);
+                NetworkManager.BaseNetworkServer.write.EntityID(this.UID);
+                NetworkManager.BaseNetworkServer.write.UInt8(0);
+                NetworkManager.BaseNetworkServer.write.Send(new SendInfo(connections));
+            }
+        }
+
+
+        #endregion
+
+        #region [Method] GetSubscribers
+        public virtual List<BasePlayer> GetSubscribers()
+        {
+            return ListViewToMe;
+        }
+        #endregion
         
         #region [Methods] Find Entities
         public static bool FindNetworkable(UInt32 uid, out BaseNetworkable entity)
@@ -91,8 +179,11 @@ namespace SapphireEmu.Rust.GObject
         public virtual void SendNetworkUpdate(Entity _entity = null)
         {
             if (_entity == null)
-                _entity = GetEntityProtobuf();
-            
+            {
+                _entity = new Entity();
+                GetEntityProtobuf(_entity);
+            }
+
             if (this is BasePlayer player && player.IsConnected)
             {
                 this.SendNetworkUpdate(new SendInfo(player.Network.NetConnection), _entity);
@@ -106,7 +197,10 @@ namespace SapphireEmu.Rust.GObject
         public virtual void SendNetworkUpdate(SendInfo _sendInfo, Entity _entity = null)
         {
             if (_entity == null)
-                _entity = GetEntityProtobuf();
+            {
+                _entity = new Entity();
+                GetEntityProtobuf(_entity);
+            }
             
             #region [Section] Temporary FIX - Alistair has promised to resolve the issue with connection.validate.entityUpdates
             
@@ -175,18 +269,14 @@ namespace SapphireEmu.Rust.GObject
 
         #region [Method] GetEntityProtobuf
 
-        public virtual Entity GetEntityProtobuf()
+        public virtual void GetEntityProtobuf(Entity entity)
         {
-            var entity = new Entity
+            entity.baseNetworkable = new ProtoBuf.BaseNetworkable
             {
-                baseNetworkable = new ProtoBuf.BaseNetworkable
-                {
-                    @group = 0,
-                    prefabID = this.PrefabID,
-                    uid = this.UID
-                }
+                @group = 0,
+                prefabID = this.PrefabID,
+                uid = this.UID
             };
-            return entity;
         }
 
         #endregion

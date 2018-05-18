@@ -86,7 +86,7 @@ namespace SapphireEmu.Rust
                 
                 this.ListItems.Add(item);
                 this.ListSlots[slot] = item;
-                item.Container = this;
+                item.SetParent(this);
                 item.PositionInContainer = slot;
                 item.HeldEntity?.SetHeld(false);
                 item.HeldEntity?.SendNetworkUpdate();
@@ -103,7 +103,7 @@ namespace SapphireEmu.Rust
                 ListSlots.Remove(item.PositionInContainer);
                 ListItems.Remove(item);
                 item.PositionInContainer = -1;
-                item.Container = null;
+                item.SetParent(null);
                 return true;
             }
             return false;

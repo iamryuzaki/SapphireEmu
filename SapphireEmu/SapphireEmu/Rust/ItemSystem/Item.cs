@@ -21,10 +21,12 @@ namespace SapphireEmu.Rust
 
         public ItemInformation Information { get; }
         
-        public ItemContainer Container { get; set; } = null;
+        public ItemContainer Container { get; private set; } = null;
         public BaseHeldEntity HeldEntity { get; private set; } = null;
 
         public E_ItemFlags ItemFlags = E_ItemFlags.None;
+
+        public event Action<Item> OnParentChanged; 
 
         private Item(ItemInformation _info, uint _amount, ulong _skinid)
         {
@@ -50,10 +52,18 @@ namespace SapphireEmu.Rust
                     ConsoleSystem.LogError($"[{nameof(Item)}] Unrealized class for <{_info.Shortname}>");
                 }
                 this.HeldEntity = (BaseHeldEntity)Framework.Bootstraper.AddType(type);
-                this.HeldEntity.ItemOwner = this;
                 this.HeldEntity.Spawn(this.Information.HeldEntity.PrefabID);
                 this.HeldEntity.SendNetworkUpdate();
+                
+                this.HeldEntity.ItemOwner = this;
+                this.HeldEntity.Initialization();
             }
+        }
+
+        public void SetParent(ItemContainer container)
+        {
+            this.Container = container;
+            this.OnParentChanged?.Invoke(this);
         }
 
         #region [Method] [Example] GetProtobufObject

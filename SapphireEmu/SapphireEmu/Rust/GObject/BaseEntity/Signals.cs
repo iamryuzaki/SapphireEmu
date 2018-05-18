@@ -1,6 +1,7 @@
 ﻿using Network;
 using SapphireEmu.Environment;
 using SapphireEmu.Extended;
+using SapphireEngine;
 
 namespace SapphireEmu.Rust.GObject
 {
