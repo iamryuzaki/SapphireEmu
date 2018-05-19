@@ -88,6 +88,7 @@ namespace SapphireEmu.Rust
     {
         public Single Damage;
         public ProjectileAmmoTypes AmmoTypes;
+        public int ProjectilesPerShot;
 
 #if RUST
         public static ItemBaseProjectileInfo Load(BaseEntity heldent)
@@ -100,6 +101,7 @@ namespace SapphireEmu.Rust
             var projectile = imProjectile.projectileObject.Get().GetComponent<Projectile>();
             ibpInfo.Damage = projectile?.damageTypes.Sum(p => p.amount) ?? 200;
             ibpInfo.AmmoTypes = (ProjectileAmmoTypes) (int) bProjectile.primaryMagazine.definition.ammoTypes;
+            ibpInfo.ProjectilesPerShot = imProjectile.numProjectiles;
             return ibpInfo;
         }
 #endif
