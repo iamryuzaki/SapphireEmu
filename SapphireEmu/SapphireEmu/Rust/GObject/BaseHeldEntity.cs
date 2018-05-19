@@ -3,6 +3,7 @@ using Facepunch;
 using Network;
 using SapphireEmu.Data.Base.GObject;
 using SapphireEmu.Extended;
+using SapphireEngine;
 using UnityEngine;
 
 namespace SapphireEmu.Rust.GObject
@@ -32,7 +33,6 @@ namespace SapphireEmu.Rust.GObject
                 return;
             }
             this.SetParent(null, 0);
-            this.limitNetworking = true;
             this.SetFlag(E_EntityFlags.Disabled, true);
             this.SendNetworkUpdate();
         }
@@ -45,6 +45,7 @@ namespace SapphireEmu.Rust.GObject
                 this.ClearOwnerPlayer();
                 return true;
             }
+            
             this.SetOwnerPlayer(ownerPlayer);
             this.SendNetworkUpdate();
             return true;
@@ -60,26 +61,15 @@ namespace SapphireEmu.Rust.GObject
             };
         }
         
-        private void InitOwnerPlayer()
-        {
-            if (!(this.GetParent() is BasePlayer ownerPlayer))
-            {
-                this.ClearOwnerPlayer();
-            }
-            else
-            {
-                this.SetOwnerPlayer(ownerPlayer);
-            }
-            this.SendNetworkUpdate();
-        }
-        
         public virtual void ClearOwnerPlayer()
         {
+            ConsoleSystem.Log("Clear");
             base.SetParent(null, 0);
             this.SetHeld(false);
         }
         public virtual void SetOwnerPlayer(BasePlayer player)
         {
+            ConsoleSystem.Log("Set");
             base.SetParent(player, HandBone);
             this.SetHeld(false);
         }
@@ -87,7 +77,6 @@ namespace SapphireEmu.Rust.GObject
         public void SetHeld(bool bHeld)
         {
             base.SetFlag(E_EntityFlags.Reserved4, bHeld);
-            base.limitNetworking = !bHeld;
             base.SetFlag(E_EntityFlags.Disabled, !bHeld);
         }
 

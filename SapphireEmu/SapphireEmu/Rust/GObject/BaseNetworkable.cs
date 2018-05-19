@@ -31,67 +31,9 @@ namespace SapphireEmu.Rust.GObject
         public GameZona CurentGameZona = null;
         public Boolean IsComponent { get; set; } = false;
         
-        public bool _limitedNetworking;
-        
         // Which player is subscribed to me and view me
         public List<BasePlayer> ListViewToMe = new List<BasePlayer>();
 
-        #region [Property] LimitNetworking
-        public bool limitNetworking
-        {
-            get => this._limitedNetworking;
-            set
-            {
-                if (value == this._limitedNetworking)
-                {
-                    return;
-                }
-                this._limitedNetworking = value;
-                if (!this._limitedNetworking)
-                {
-                    this.OnNetworkLimitEnd();
-                }
-                else
-                {
-                    this.OnNetworkLimitStart();
-                }
-            }
-        }
-        #endregion
-
-        #region [Methods] NetworkLimit [Start|End]
-        private void OnNetworkLimitStart()
-        {
-            List<Connection> subscribers = this.GetSubscribers().Where(p=>p.IsConnected).Select(p=>p.Network.NetConnection).ToList();
-            if (subscribers.Count == 0)
-            {
-                return;
-            }
-//            subscribers.RemoveAll((Connection x) => this.ShouldNetworkTo(x.player as BasePlayer));
-            this.OnNetworkSubscribersLeave(subscribers);
-            var children = (this as BaseEntity)?.Children;
-            if (children != null && children.Count > 0)
-            {
-                foreach (BaseEntity child in children)
-                {
-                    child.OnNetworkLimitStart();
-                }
-            }
-        }
-        
-        private void OnNetworkLimitEnd()
-            {
-                this.SendNetworkUpdate();
-                var children = (this as BaseEntity)?.Children;
-                if (children != null && children.Count > 0)
-                {
-                    foreach (BaseEntity child in children)
-                    {
-                        child.OnNetworkLimitEnd();
-                    }
-                }
-            }
-        #endregion
 
         #region [Methods] Visibility
 
