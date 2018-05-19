@@ -14,6 +14,7 @@ namespace SapphireEmu.Environment
         {
             ConsoleSystem.OutputPath = BuildingInformation.DirectoryLogs + "/output.log";
             ConsoleSystem.OnConsoleInput += ConsoleNetwork.OnServerCommand;
+            ConsoleSystem.ShowCallerInLog = Settings.ShowCallerInLog;
             this.Database_Initialization();
             ZonaManager.Initialization();
             ItemManager.Initialization();

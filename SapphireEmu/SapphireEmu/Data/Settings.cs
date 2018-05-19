@@ -24,5 +24,7 @@
         public const int MapZonaSize = 20;
         public const int MapZonaCount = 200; // 200 * 20 = 2000x2000  map
         public const int MapZonesLine = MapZonaPlayerView / MapZonaSize;
+
+        public const bool ShowCallerInLog = true;
     }
 }
