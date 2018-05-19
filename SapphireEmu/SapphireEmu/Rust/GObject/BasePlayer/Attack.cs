@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Facepunch;
 using Network;
 using ProtoBuf;
 using SapphireEmu.Environment;
@@ -15,15 +16,25 @@ namespace SapphireEmu.Rust.GObject
         {
             PlayerProjectileAttack ppAttack = PlayerProjectileAttack.Deserialize(packet.read);
             PlayerAttack playerAttack = ppAttack.playerAttack;
-            if (Find(playerAttack.attack.hitID, out BaseEntity hitEntity))
+
+            if (firedProjectiles.TryGetValue(playerAttack.projectileID, out ItemInformation info))
             {
-                if (hitEntity is BaseCombatEntity hitCombatEntity)
+                firedProjectiles.Remove(playerAttack.projectileID);
+                
+                if (Find(playerAttack.attack.hitID, out BaseEntity hitEntity))
                 {
-                    if (firedProjectiles.TryGetValue(playerAttack.projectileID, out ItemInformation info))
+                    if (hitEntity is BaseCombatEntity hitCombatEntity)
                     {
                         hitCombatEntity.Hurt(info.BaseProjectile.Damage);
                     }
                 }
+            }
+
+            Release();
+            
+            void Release()
+            {
+                Pool.Free(ref ppAttack);
             }
         }
         #endregion
