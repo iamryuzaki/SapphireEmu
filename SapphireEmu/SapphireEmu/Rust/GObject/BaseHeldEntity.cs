@@ -93,11 +93,6 @@ namespace SapphireEmu.Rust.GObject
 
             if ((this.PlayerOwner?.ListViewToMe.Count ?? 0) != 0)
                 this.SendNetworkUpdate(new SendInfo(this.PlayerOwner.ListViewToMe.ToConnectionsList()), _entity);
-
-            if (this.PlayerOwner == null && BasePlayer.ListOnlinePlayers.Count > 0)
-            {
-                this.SendNetworkUpdate(new SendInfo(BasePlayer.ListOnlinePlayers.ToConnectionsList()), _entity);
-            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Network;
+﻿using Facepunch;
+using Network;
 using ProtoBuf;
 using SapphireEmu.Environment;
 using SapphireEmu.Extended;
@@ -8,6 +9,29 @@ namespace SapphireEmu.Rust.GObject
 {
     public class BaseMelee : BaseHeldEntity
     {
+        [RPCMethod(ERPCMethodType.CLProject)]
+        void OnRPC_CLProject(Message packet)
+        {
+            ProjectileShoot projectileShoot = ProjectileShoot.Deserialize(packet.read);
+            
+            foreach (var projectile in projectileShoot.projectiles)
+            {
+                PlayerOwner.firedProjectiles.Add(projectile.projectileID, ItemOwner.Information);
+            }
+            
+            var container = ItemOwner.Container;
+            container.RemoveItemFromContainer(ItemOwner);
+            container.OnItemConainerUpdate();
+            
+            Release();
+
+            void Release()
+            {
+                projectileShoot.Dispose();
+                Pool.Free(ref projectileShoot);
+            }
+        }
+
         #region [Method] OnRPC_OnPlayerAttack
         [RPCMethod(ERPCMethodType.PlayerAttack)]
         void OnRPC_PlayerAttack(Message packet)

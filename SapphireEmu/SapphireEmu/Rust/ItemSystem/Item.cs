@@ -84,5 +84,21 @@ namespace SapphireEmu.Rust
             return item;
         }
         #endregion
+
+        public void Use(uint amountToConsume = 1)
+        {
+            if (amountToConsume <= 0)
+            {
+                return;
+            }
+
+            if (Amount > amountToConsume)
+                this.Amount -= amountToConsume;
+            else
+            {
+                this.Amount = 0;
+                this.Container?.RemoveItemFromContainer(this);
+            }
+        }
     }
 }

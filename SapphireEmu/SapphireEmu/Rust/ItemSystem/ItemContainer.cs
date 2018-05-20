@@ -131,6 +131,10 @@ namespace SapphireEmu.Rust
             return false;
         }
 
+        public List<Item> FindItemsByItemID(int itemid)
+        {
+            return this.ListItems.FindAll((Item x) => x.Information.ItemID == itemid);
+        }
 
         public ProtoBuf.ItemContainer GetProtobufObject()
         {

@@ -25,7 +25,7 @@ namespace SapphireEmu.Rust.GObject
                 {
                     if (hitEntity is BaseCombatEntity hitCombatEntity)
                     {
-                        hitCombatEntity.Hurt(info.BaseProjectile.Damage);
+                        hitCombatEntity.Hurt(info.BaseProjectile?.Damage ?? info.BaseMelee.Damage);
                     }
                 }
             }

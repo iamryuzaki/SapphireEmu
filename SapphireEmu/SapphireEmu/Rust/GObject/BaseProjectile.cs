@@ -1,6 +1,10 @@
-﻿using Network;
+﻿using System.IO;
+using Facepunch;
+using Network;
 using ProtoBuf;
 using SapphireEmu.Environment;
+using SapphireEngine;
+using SapphireEngine.Functions;
 using UnityEngine;
 
 namespace SapphireEmu.Rust.GObject
@@ -16,13 +20,57 @@ namespace SapphireEmu.Rust.GObject
         [RPCMethod(ERPCMethodType.CLProject)]
         void OnRPC_ClProject(Message packet)
         {
-            using (ProjectileShoot projectileShoot = ProjectileShoot.Deserialize(packet.read))
+            ProjectileShoot projectileShoot = ProjectileShoot.Deserialize(packet.read);
+            if (projectileShoot.projectiles.Count > ItemOwner.Information.BaseProjectile.ProjectilesPerShot)
             {
-                foreach (var projectile in projectileShoot.projectiles)
+                ConsoleSystem.Log($"projectiles.Count[{projectileShoot.projectiles.Count}] > ProjectilesPerShot[{ItemOwner.Information.BaseProjectile.ProjectilesPerShot}]");
+                Release();
+                return;
+            }
+
+            if (AmmoCount <= 0)
+            {
+                ConsoleSystem.Log($"AmmoCount[{AmmoCount}] <= 0");
+                Release();
+                return;
+            }
+
+            AmmoCount--;
+            
+            foreach (var projectile in projectileShoot.projectiles)
+            {
+                PlayerOwner.firedProjectiles.Add(projectile.projectileID, ItemOwner.Information);
+            }
+            base.SignalBroadcast(E_Signal.Attack, string.Empty, packet.connection);
+            
+            Release();
+
+            void Release()
+            {
+                projectileShoot.Dispose();
+                Pool.Free(ref projectileShoot);
+            }
+        }
+        #endregion
+
+        #region OnRPC_Reload
+        [RPCMethod(ERPCMethodType.Reload)]
+        void OnRPC_Reload(Message packet)
+        {
+            if (AmmoCount == AmmoMax) return;
+            var items = PlayerOwner.Inventory.FindItemIDs(AmmoType);
+            
+            foreach (Item item in items)
+            {
+                int num = this.AmmoMax - this.AmmoCount;
+                for (int i = 0; i < num && item.Amount > 0; i++)
                 {
-                    PlayerOwner.firedProjectiles.Add(projectile.projectileID, ItemOwner.Information);
+                    this.AmmoCount++;
+                    item.Use(1);
                 }
             }
+            PlayerOwner.Inventory.OnInventoryUpdate();
+            this.SendNetworkUpdate();
         }
         #endregion
         
