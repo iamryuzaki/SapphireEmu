@@ -34,28 +34,6 @@ namespace SapphireEmu.Rust.GObject
         // Which player is subscribed to me and view me
         public List<BasePlayer> ListViewToMe = new List<BasePlayer>();
 
-
-        #region [Methods] Visibility
-
-        public void OnNetworkSubscribersLeave(List<Connection> connections)
-        {
-            if (!NetworkManager.BaseNetworkServer.IsConnected())
-            {
-                return;
-            }
-            
-            if (NetworkManager.BaseNetworkServer.write.Start())
-            {
-                NetworkManager.BaseNetworkServer.write.PacketID(Message.Type.EntityDestroy);
-                NetworkManager.BaseNetworkServer.write.EntityID(this.UID);
-                NetworkManager.BaseNetworkServer.write.UInt8(0);
-                NetworkManager.BaseNetworkServer.write.Send(new SendInfo(connections));
-            }
-        }
-
-
-        #endregion
-
         #region [Method] GetSubscribers
         public virtual List<BasePlayer> GetSubscribers()
         {

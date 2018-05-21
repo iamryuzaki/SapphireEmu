@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using ProtoBuf;
 using SapphireEmu.Data.Base.GObject;
-using UnityEngine;
 
 namespace SapphireEmu.Rust.GObject
 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using ProtoBuf;
-using SapphireEngine;
 
 namespace SapphireEmu.Rust.GObject
 {

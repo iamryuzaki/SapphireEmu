@@ -1,6 +1,5 @@
 ﻿using Network;
 using SapphireEmu.Environment;
-using SapphireEngine;
 using Message = Network.Message;
 
 namespace SapphireEmu.Rust.GObject.Component

@@ -1,7 +1,6 @@
 ﻿using SapphireEmu.Environment;
 using SapphireEmu.Rust.GObject;
 using SapphireEngine;
-using SapphireEngine.Functions;
 using UnityEngine;
 
 namespace SapphireEmu.Rust.Commands
