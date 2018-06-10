@@ -4,7 +4,6 @@ using Network;
 using SapphireEmu.Data.Base.GObject;
 using SapphireEmu.Extended;
 using SapphireEngine;
-using UnityEngine;
 
 namespace SapphireEmu.Rust.GObject
 {

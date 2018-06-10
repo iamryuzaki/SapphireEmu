@@ -1,11 +1,8 @@
-﻿using System.IO;
-using Facepunch;
+﻿using Facepunch;
 using Network;
 using ProtoBuf;
 using SapphireEmu.Environment;
 using SapphireEngine;
-using SapphireEngine.Functions;
-using UnityEngine;
 
 namespace SapphireEmu.Rust.GObject
 {

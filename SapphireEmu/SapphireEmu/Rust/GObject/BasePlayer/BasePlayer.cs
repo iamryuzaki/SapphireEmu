@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using Network;
 using ProtoBuf;
 using SapphireEmu.Environment;
 using SapphireEmu.Rust.GObject.Component;
 using SapphireEngine;
 using UnityEngine;
-using Timer = SapphireEngine.Functions.Timer;
 
 namespace SapphireEmu.Rust.GObject
 {
